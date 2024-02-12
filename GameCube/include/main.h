@@ -168,7 +168,7 @@ namespace mod
                                                int32_t unk3,
                                                void* unk4);
 
-    /*
+    
     void handle_dComIfGp_setNextStage( const char* stage,
                                        int16_t point,
                                        int8_t roomNo,
@@ -192,7 +192,7 @@ namespace mod
                                                    int16_t lastAngle,
                                                    int32_t param_9,
                                                    int32_t wipSpeedT );
-    */
+    
 
     int32_t handle_tgscInfoInit(void* stageDt, void* i_data, int32_t entryNum, void* param_3);
     extern int32_t (*return_tgscInfoInit)(void* stageDt, void* i_data, int32_t entryNum, void* param_3);

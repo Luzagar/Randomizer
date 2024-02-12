@@ -124,7 +124,7 @@ namespace mod
                                                  int32_t num,
                                                  void* raw_data) = nullptr;
 
-    /*
+    
     KEEP_VAR void ( *return_dComIfGp_setNextStage )( const char* stage,
                                                      int16_t point,
                                                      int8_t roomNo,
@@ -136,7 +136,7 @@ namespace mod
                                                      int16_t lastAngle,
                                                      int32_t param_9,
                                                      int32_t wipSpeedT ) = nullptr;
-    */
+    
 
     // GetLayerNo trampoline
     KEEP_VAR int32_t (*return_getLayerNo_common_common)(const char* stageName, int32_t roomId, int32_t layerOverride) = nullptr;
@@ -800,7 +800,7 @@ namespace mod
         return return_tgscInfoInit(stageDt, i_data, entryNum, param_3);
     }
 
-    /*
+    
     KEEP_FUNC void handle_dComIfGp_setNextStage( const char* stage,
                                                  int16_t point,
                                                  int8_t roomNo,
@@ -814,12 +814,12 @@ namespace mod
                                                  int32_t wipSpeedT )
     {
         if ( libtp::tp::d_a_alink::checkStageName(
-                 libtp::data::stage::allStages[libtp::data::stage::StageIDs::Hidden_Skill] ) &&
-             ( roomNo == 6 ) )
+                 libtp::data::stage::allStages[libtp::data::stage::StageIDs::Ordon_Village] ) )
         {
             // If we are in the hidden skill area and the wolf is trying to force load room 6, we know that we are trying to
             // go back to faron so we want to use the default state instead of forcing 0.
-            layer = 0xff;
+           stage = "D_MN09C";
+           point = 0x22;
         }
         return return_dComIfGp_setNextStage( stage,
                                              point,
@@ -833,7 +833,7 @@ namespace mod
                                              param_9,
                                              wipSpeedT );
     }
-    */
+    
 
     KEEP_FUNC void handle_roomLoader(void* data, void* stageDt, int32_t roomNo)
     {
