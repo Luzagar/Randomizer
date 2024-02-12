@@ -241,7 +241,7 @@ namespace mod
                                                  int32_t param_1,
                                                  int32_t param_2) = nullptr;
     KEEP_VAR bool (*return_checkCastleTownUseItem)(uint16_t item_id) = nullptr;
-     KEEP_VAR void (*return_procCoGetItemInit)(libtp::tp::d_a_alink::daAlink* linkActrPtr) = nullptr;
+     KEEP_VAR int32_t (*return_procCoGetItemInit)(libtp::tp::d_a_alink::daAlink* linkActrPtr) = nullptr;
 
     // Audio functions
     KEEP_VAR void (*return_loadSeWave)(void* Z2SceneMgr, uint32_t waveID) = nullptr;
@@ -818,7 +818,7 @@ namespace mod
         events::onDZX(randomizer, chunkTypeInfo);
         return return_actorInit(mStatus_roomControl, chunkTypeInfo, unk3, unk4);
     }
-    KEEP_FUNC void handle_procCoGetItemInit(libtp::tp::d_a_alink::daAlink* linkActrPtr)
+    KEEP_FUNC int32_t handle_procCoGetItemInit(libtp::tp::d_a_alink::daAlink* linkActrPtr)
     {
         // If we are giving a custom item, we want to set mParam0 to 0x100 so that instead of trying to search for an item actor
         // that doesnt exist we want the game to create one using the item id in mGtItm.
@@ -829,7 +829,7 @@ namespace mod
         }
         return_procCoGetItemInit(linkActrPtr);
 
-        return;
+        return 1;
     }
 
     KEEP_FUNC bool handle_actorInit_always(void* mStatus_roomControl,
