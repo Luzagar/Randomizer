@@ -86,6 +86,7 @@ namespace mod
     bool transformAnywhereEnabled = false;
     uint8_t damageMultiplier = 1;
     bool bonksDoDamage = false;
+    bool giveItem = true;
 
 #ifdef TP_EU
     KEEP_VAR libtp::tp::d_s_logo::Languages currentLanguage = libtp::tp::d_s_logo::Languages::uk;
@@ -240,6 +241,7 @@ namespace mod
                                                  int32_t param_1,
                                                  int32_t param_2) = nullptr;
     KEEP_VAR bool (*return_checkCastleTownUseItem)(uint16_t item_id) = nullptr;
+     KEEP_VAR void (*return_procCoGetItemInit)(libtp::tp::d_a_alink::daAlink* linkActrPtr) = nullptr;
 
     // Audio functions
     KEEP_VAR void (*return_loadSeWave)(void* Z2SceneMgr, uint32_t waveID) = nullptr;
@@ -735,6 +737,50 @@ namespace mod
         {
             events::handleTimeSpeed();
         }
+         // Giving items at any point
+
+       else if (checkButtonCombo(PadInputs::Button_R | PadInputs::Button_B, true))
+            {
+                using namespace libtp::tp;
+                using namespace libtp::tp::f_op_actor_mng;
+
+                // Check if link is currently in a cutscene
+                if (!d_a_alink::checkEventRun(linkMapPtr))
+                {
+                    // Ensure that link is not currently in a message-based event. This is just mPlayer.mMsgFlow.mEventID but im
+                    // lazy atm
+                    if (static_cast<uint16_t>(d_com_inf_game::dComIfG_gameInfo.play.mPlayer->mMsgFlow.mEventId == 0))
+                    {
+                        // Next we set the item we want the player to get from the event. For testing purposes, we used the
+                        // Double Claw
+                        libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mEvent.mGtItm = libtp::data::items::Bed_Key;
+
+                        d_com_inf_game::dComIfG_gameInfo.play.mPlayer->mProcID = libtp::tp::d_a_alink::PROC_GET_ITEM;
+
+                        //  Get the event index for the "Get Item" event.
+                        int16_t eventIdx = d_event_manager::getEventIdx(
+                            &d_com_inf_game::dComIfG_gameInfo.play.mEvtManager,
+                            reinterpret_cast<f_op_actor::fopAc_ac_c*>(d_com_inf_game::dComIfG_gameInfo.play.mPlayer),
+                            "DEFAULT_GETITEM",
+                            0xff);
+
+                        // Finally we want to modify the event stack to prioritize our custom event so that it happens next.
+                        fopAcM_orderChangeEventId(reinterpret_cast<void*>(d_com_inf_game::dComIfG_gameInfo.play.mPlayer),
+                                                  eventIdx,
+                                                  1,
+                                                  0xFFFF);
+
+                        // Once we are done, we set a global bool that is checked in procCoGetItemInit to give the player the
+                        // item.
+                        giveItem = true;
+                    }
+                }
+            }
+                
+            
+        
+
+
         // End of custom events
 
         // Call the original function
@@ -771,6 +817,19 @@ namespace mod
         // Load DZX based randomizer checks that are stored in the local DZX
         events::onDZX(randomizer, chunkTypeInfo);
         return return_actorInit(mStatus_roomControl, chunkTypeInfo, unk3, unk4);
+    }
+    KEEP_FUNC void handle_procCoGetItemInit(libtp::tp::d_a_alink::daAlink* linkActrPtr)
+    {
+        // If we are giving a custom item, we want to set mParam0 to 0x100 so that instead of trying to search for an item actor
+        // that doesnt exist we want the game to create one using the item id in mGtItm.
+        if (giveItem)
+        {
+           libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer->mDemo.mParam0 = 0x100; // 0x60C in daAlink struct
+            giveItem = false;
+        }
+        return_procCoGetItemInit(linkActrPtr);
+
+        return;
     }
 
     KEEP_FUNC bool handle_actorInit_always(void* mStatus_roomControl,
