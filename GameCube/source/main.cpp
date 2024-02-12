@@ -812,14 +812,16 @@ namespace mod
                                                  int16_t lastAngle,
                                                  int32_t param_9,
                                                  int32_t wipSpeedT )
+                                                 
     {
         if ( libtp::tp::d_a_alink::checkStageName(
-                 libtp::data::stage::allStages[libtp::data::stage::StageIDs::Ordon_Village] ) )
+                 libtp::data::stage::allStages[libtp::data::stage::StageIDs::Blizzeta] ) && strcmp("F_SP114",stage) == 0  )
         {
             // If we are in the hidden skill area and the wolf is trying to force load room 6, we know that we are trying to
             // go back to faron so we want to use the default state instead of forcing 0.
            stage = "D_MN09C";
-           point = 0x22;
+           point = 0x16;
+           roomNo = 0;
         }
         return return_dComIfGp_setNextStage( stage,
                                              point,
