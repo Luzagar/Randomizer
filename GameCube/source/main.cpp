@@ -86,7 +86,8 @@ namespace mod
     bool transformAnywhereEnabled = false;
     uint8_t damageMultiplier = 1;
     bool bonksDoDamage = false;
-    bool giveItem = true;
+    bool giveItem;
+    bool haveBk = false;
 
 #ifdef TP_EU
     KEEP_VAR libtp::tp::d_s_logo::Languages currentLanguage = libtp::tp::d_s_logo::Languages::uk;
@@ -125,19 +126,17 @@ namespace mod
                                                  int32_t num,
                                                  void* raw_data) = nullptr;
 
-    
-    KEEP_VAR void ( *return_dComIfGp_setNextStage )( const char* stage,
-                                                     int16_t point,
-                                                     int8_t roomNo,
-                                                     int8_t layer,
-                                                     float lastSpeed,
-                                                     uint32_t lastMode,
-                                                     int32_t setPoint,
-                                                     int8_t wipe,
-                                                     int16_t lastAngle,
-                                                     int32_t param_9,
-                                                     int32_t wipSpeedT ) = nullptr;
-    
+    KEEP_VAR void (*return_dComIfGp_setNextStage)(const char* stage,
+                                                  int16_t point,
+                                                  int8_t roomNo,
+                                                  int8_t layer,
+                                                  float lastSpeed,
+                                                  uint32_t lastMode,
+                                                  int32_t setPoint,
+                                                  int8_t wipe,
+                                                  int16_t lastAngle,
+                                                  int32_t param_9,
+                                                  int32_t wipSpeedT) = nullptr;
 
     // GetLayerNo trampoline
     KEEP_VAR int32_t (*return_getLayerNo_common_common)(const char* stageName, int32_t roomId, int32_t layerOverride) = nullptr;
@@ -241,7 +240,7 @@ namespace mod
                                                  int32_t param_1,
                                                  int32_t param_2) = nullptr;
     KEEP_VAR bool (*return_checkCastleTownUseItem)(uint16_t item_id) = nullptr;
-     KEEP_VAR int32_t (*return_procCoGetItemInit)(libtp::tp::d_a_alink::daAlink* linkActrPtr) = nullptr;
+    KEEP_VAR int32_t (*return_procCoGetItemInit)(libtp::tp::d_a_alink::daAlink* linkActrPtr) = nullptr;
 
     // Audio functions
     KEEP_VAR void (*return_loadSeWave)(void* Z2SceneMgr, uint32_t waveID) = nullptr;
@@ -476,6 +475,8 @@ namespace mod
         using namespace tp::m_do_controller_pad;
         using namespace tp::f_pc_node_req;
         using namespace tp::d_com_inf_game;
+        libtp::tp::d_com_inf_game::dComIfG_inf_c* gameInfoPtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo;
+        libtp::tp::d_save::dSv_player_status_a_c* playerStatusPtr = &gameInfoPtr->save.save_file.player.player_status_a;
 
 // Uncomment out the next line to display debug heap info
 // #define DRAW_DEBUG_HEAP_INFO
@@ -675,6 +676,7 @@ namespace mod
                 {
                     // Volatile patches need to be applied whenever a file is loaded
                     // getConsole() << "Applying volatile patches:\n";
+
                     seed->applyVolatilePatches(true);
                 }
             }
@@ -737,9 +739,14 @@ namespace mod
         {
             events::handleTimeSpeed();
         }
-         // Giving items at any point
-
-       else if (checkButtonCombo(PadInputs::Button_R | PadInputs::Button_B, true))
+        if (libtp::tp::d_a_alink::checkStageName(libtp::data::stage::allStages[libtp::data::stage::StageIDs::Title_Screen]))
+        {
+            haveBk = false;
+        }
+        // Giving items at any point
+        if (libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer)
+        {
+            if (!events::haveItem(libtp::data::items::Bed_Key) && playerStatusPtr->currentHealth == 56 && !haveBk)
             {
                 using namespace libtp::tp;
                 using namespace libtp::tp::f_op_actor_mng;
@@ -756,6 +763,7 @@ namespace mod
                         libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mEvent.mGtItm = libtp::data::items::Bed_Key;
 
                         d_com_inf_game::dComIfG_gameInfo.play.mPlayer->mProcID = libtp::tp::d_a_alink::PROC_GET_ITEM;
+                        haveBk = true;
 
                         //  Get the event index for the "Get Item" event.
                         int16_t eventIdx = d_event_manager::getEventIdx(
@@ -776,10 +784,7 @@ namespace mod
                     }
                 }
             }
-                
-            
-        
-
+        }
 
         // End of custom events
 
@@ -824,9 +829,10 @@ namespace mod
         // that doesnt exist we want the game to create one using the item id in mGtItm.
         if (giveItem)
         {
-           libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer->mDemo.mParam0 = 0x100; // 0x60C in daAlink struct
+            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer->mDemo.mParam0 = 0x100; // 0x60C in daAlink struct
             giveItem = false;
         }
+
         return_procCoGetItemInit(linkActrPtr);
 
         return 1;
@@ -859,42 +865,40 @@ namespace mod
         return return_tgscInfoInit(stageDt, i_data, entryNum, param_3);
     }
 
-    
-    KEEP_FUNC void handle_dComIfGp_setNextStage( const char* stage,
-                                                 int16_t point,
-                                                 int8_t roomNo,
-                                                 int8_t layer,
-                                                 float lastSpeed,
-                                                 uint32_t lastMode,
-                                                 int32_t setPoint,
-                                                 int8_t wipe,
-                                                 int16_t lastAngle,
-                                                 int32_t param_9,
-                                                 int32_t wipSpeedT )
-                                                 
+    KEEP_FUNC void handle_dComIfGp_setNextStage(const char* stage,
+                                                int16_t point,
+                                                int8_t roomNo,
+                                                int8_t layer,
+                                                float lastSpeed,
+                                                uint32_t lastMode,
+                                                int32_t setPoint,
+                                                int8_t wipe,
+                                                int16_t lastAngle,
+                                                int32_t param_9,
+                                                int32_t wipSpeedT)
+
     {
-        if ( libtp::tp::d_a_alink::checkStageName(
-                 libtp::data::stage::allStages[libtp::data::stage::StageIDs::Blizzeta] ) && strcmp("F_SP114",stage) == 0  )
+        if (libtp::tp::d_a_alink::checkStageName(libtp::data::stage::allStages[libtp::data::stage::StageIDs::Blizzeta]) &&
+            strcmp("F_SP114", stage) == 0)
         {
             // If we are in the hidden skill area and the wolf is trying to force load room 6, we know that we are trying to
             // go back to faron so we want to use the default state instead of forcing 0.
-           stage = "D_MN09C";
-           point = 0x16;
-           roomNo = 0;
+            stage = "D_MN09C";
+            point = 0x16;
+            roomNo = 0;
         }
-        return return_dComIfGp_setNextStage( stage,
-                                             point,
-                                             roomNo,
-                                             layer,
-                                             lastSpeed,
-                                             lastMode,
-                                             setPoint,
-                                             wipe,
-                                             lastAngle,
-                                             param_9,
-                                             wipSpeedT );
+        return return_dComIfGp_setNextStage(stage,
+                                            point,
+                                            roomNo,
+                                            layer,
+                                            lastSpeed,
+                                            lastMode,
+                                            setPoint,
+                                            wipe,
+                                            lastAngle,
+                                            param_9,
+                                            wipSpeedT);
     }
-    
 
     KEEP_FUNC void handle_roomLoader(void* data, void* stageDt, int32_t roomNo)
     {
