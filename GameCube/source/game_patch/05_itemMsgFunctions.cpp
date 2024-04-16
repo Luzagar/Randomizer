@@ -1,6 +1,7 @@
 #include "game_patch/game_patch.h"
 #include "data/items.h"
 #include "data/stages.h"
+#include "data/flags.h"
 #include "tp/bmgres.h"
 #include "main.h"
 #include "tp/control.h"
@@ -210,6 +211,10 @@ namespace mod::game_patch
 
         // This project changes the poe count to increment after the message is displayed, so add one to get the new count
         uint32_t poeCount = libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_collect.poe_count + 1;
+        if(poeCount == 42){
+            randomizer->addItemToEventQueue(rando::customItems::Hyrule_Castle_Big_Key);
+             events::setSaveFileEventFlag(libtp::data::flags::BARRIER_GONE);
+        }
         return createString(format, msgSize, poeCount);
     };
 

@@ -286,7 +286,8 @@ namespace mod::rando
         HC_Fused_Shadows = 1,
         HC_Mirror_Shards,
         HC_All_Dungeons,
-        HC_Vanilla
+        HC_Vanilla,
+        HC_Papy_Birthday
     };
 
     enum PalaceEntryRequirements : uint8_t
