@@ -367,6 +367,11 @@ namespace mod::events
                                 *reinterpret_cast<float*>(reinterpret_cast<uint32_t>(daObjLifePtr) + 0x4D4) = height + 40.f;
                                 break;
                             }
+                            case items::Aurus_Memo:
+                            {
+                                *reinterpret_cast<float*>(reinterpret_cast<uint16_t>(daObjLifePtr) + 0x4E4) = 48.f;
+                                break;
+                            }
                             case customItems::Forest_Temple_Small_Key:
                             case customItems::Goron_Mines_Small_Key:
                             case customItems::Lakebed_Temple_Small_Key:
