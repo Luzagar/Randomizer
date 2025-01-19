@@ -206,7 +206,7 @@ namespace mod::customMessages
         MSG_COLOR(MSG_COLOR_LIGHT_BLUE)
         "cold"
         MSG_COLOR(MSG_COLOR_WHITE)
-        " wind blows.."
+        " wind blows..."
     MSG_END();
     MSG_BEGIN_ARRAY(talkToMidnaEn)
         "What is it, "
@@ -275,14 +275,9 @@ namespace mod::customMessages
         MSG_COLOR(MSG_COLOR_WHITE)
         " character(s) so far."
     MSG_END();
-    MSG_BEGIN_ARRAY(charloDonationEn)
-        "For the sake of peace in Hyrule...\nWould you please make a donation?" 
-        MSG_OPTION_LIST(MSG_OPTION_1) 
-        "100 Rupees\n" 
-        MSG_OPTION_LIST(MSG_OPTION_2) 
-        "50 Rupees\n" 
-        MSG_OPTION_LIST(MSG_OPTION_3) 
-        "Sorry..."
+    MSG_BEGIN_ARRAY(spawnTextEn)
+        "Return to Spawn"
+        MSG_ICON(MSG_ICON_Z)
     MSG_END();
     MSG_BEGIN_ARRAY(recognitionMsg)
         MSG_SPEED(MSG_SPEED_FAST)
@@ -362,7 +357,7 @@ namespace mod::customMessages
         // First Ancient Sky Book character
         skyBookCharacterEn,
         sizeof(skyBookCharacterEn),
-        0x013F,
+        0x014E,
 
         // First Fused Shadow
         firstFusedShadowEn,
@@ -448,6 +443,11 @@ namespace mod::customMessages
         recognitionMsg,
         sizeof(recognitionMsg),
         0x0b44,
+
+        // Spawn text
+        spawnTextEn,
+        sizeof(spawnTextEn),
+        0x555,
 
         // Special invalid-id texts
         // for
@@ -538,7 +538,6 @@ namespace mod::customMessages
     };
 
     const uint32_t totalCustomMessagesUs = sizeof(entriesUs) / sizeof(MsgEntry);
-    const MsgEntry charloDonationEntryUs = {charloDonationEn, sizeof(charloDonationEn), 0x0355};
 
     const ItemWheelMenuStrings itemWheelMenuStringsUs = {
         // areasBeingTracked
@@ -558,9 +557,6 @@ namespace mod::customMessages
 
         // seedIsLoaded
         "Seed",
-
-        // seedIsNotLoaded
-        "No seed is currently loaded",
 
         // yes/no
         "Yes",

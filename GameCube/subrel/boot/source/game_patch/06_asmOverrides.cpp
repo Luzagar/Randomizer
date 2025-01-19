@@ -1,5 +1,6 @@
 #include <cstdint>
 
+#include "main.h"
 #include "game_patch/game_patch.h"
 #include "asm_templates.h"
 #include "tp/d_item.h"
@@ -14,8 +15,10 @@
 #include "tp/d_com_inf_game.h"
 #include "tp/m_Do_dvd_thread.h"
 #include "Z2AudioLib/Z2SceneMgr.h"
-#include "tp/d_msg_object.h"
 #include "tp/d_meter2_draw.h"
+#include "functionHooks.h"
+#include "tp/d_menu_ring.h"
+#include "tp/d_a_obj_item.h"
 
 namespace mod::game_patch
 {
@@ -32,7 +35,6 @@ namespace mod::game_patch
         uint32_t* enableCrashScreen = reinterpret_cast<uint32_t*>(0x8000B8A4);
         uint32_t* patchMessageCalculation = reinterpret_cast<uint32_t*>(0x802398E0);
 #endif
-
         // Perform the overwrites
 
         /* If the address is loaded into the cache before the overwrite is made,
@@ -43,6 +45,11 @@ namespace mod::game_patch
 
         // Nop out the instruction that causes a miscalculation in message resources.
         *patchMessageCalculation = ASM_NOP;
+
+        // Force checkTreasureRupeeReturn to return false by overwriting the first two instructions in it
+        uint32_t checkTreasureRupeeReturnAddress = reinterpret_cast<uint32_t>(libtp::tp::d_a_alink::checkTreasureRupeeReturn);
+        *reinterpret_cast<uint32_t*>(checkTreasureRupeeReturnAddress) = ASM_LOAD_IMMEDIATE(3, 0);       // Previous 0x9421fff0
+        *reinterpret_cast<uint32_t*>(checkTreasureRupeeReturnAddress + 0x4) = ASM_BRANCH_LINK_REGISTER; // Previous 0x7c0802a6
 
         // Modify the Wooden Sword function to not set a region flag by default by nopping out the function call to isSwitch
         uint32_t woodenSwordFunctionAddress = reinterpret_cast<uint32_t>(libtp::tp::d_item::item_func_WOOD_STICK);
@@ -87,15 +94,44 @@ namespace mod::game_patch
         libtp::patch::writeBranchBL(screenSetAddress + 0xDCC, events::getPauseRupeeMax);
         libtp::patch::writeBranchBL(screenSetAddress + 0xDF0, events::getPauseRupeeMax);
 
-        // Modify isSend button checks to allow for automashing through text
-        uint32_t isSendAddress = reinterpret_cast<uint32_t>(libtp::tp::d_msg_object::isSend);
-        libtp::patch::writeBranchBL(isSendAddress + 0xE4, events::autoMashThroughText);
-        libtp::patch::writeBranchBL(isSendAddress + 0x160, events::autoMashThroughText);
-        libtp::patch::writeBranchBL(isSendAddress + 0x1B8, events::autoMashThroughText);
-
         // Modify drawKanteraScreen to change the lantern meter color to match lantern light color from seed.
         uint32_t drawKanteraAddress = reinterpret_cast<uint32_t>(libtp::tp::d_meter2_draw::drawKanteraScreen);
         libtp::patch::writeBranchBL(drawKanteraAddress + 0xE4, events::modifyLanternMeterColor);
+
+        uint32_t procCoGetItemInitAddress = reinterpret_cast<uint32_t>(libtp::tp::d_a_alink::procCoGetItemInit);
+        libtp::patch::writeBranchBL(procCoGetItemInitAddress + 0x17C, procCoGetItemInitCreateItem);
+
+        // Modify the item wheel constructor to allow equipping of items, even as wolf
+        uint32_t itemWheelConstructorAddress = reinterpret_cast<uint32_t>(libtp::tp::d_menu_ring::dMenuRing_ct);
+        *reinterpret_cast<uint32_t*>(itemWheelConstructorAddress + 0x15C) = ASM_LOAD_IMMEDIATE(0, 0);
+
+        // Modify the checkStatus Function to show us the current equips, even as wolf
+        const uint32_t checkStatus_address = reinterpret_cast<uint32_t>(libtp::tp::d_meter2::checkStatus);
+        libtp::patch::writeBranchBL(checkStatus_address + 0x3C, assembly::asmManageEquippedItemsAsWolf);
+
+        const uint32_t decideDoStatus_address = reinterpret_cast<uint32_t>(libtp::tp::d_a_alink::decideDoStatus);
+        libtp::patch::writeBranchBL(decideDoStatus_address + 0x4D4, handleAdjustToTSwordReq);
+
+        // give all items that have an item ID of 0x13 or higher
+        const uint32_t itemGetAddr = reinterpret_cast<uint32_t>(libtp::tp::d_a_obj_item::itemGet);
+        *reinterpret_cast<uint32_t*>(itemGetAddr + 0x54) = ASM_NOP;
+
+        // All non rupee/ammo items use procInitSimpleDemo and itemGet
+        const uint32_t itemGetNextExecuteAddr = reinterpret_cast<uint32_t>(libtp::tp::d_a_obj_item::itemGetNextExecute);
+        *reinterpret_cast<uint32_t*>(itemGetNextExecuteAddr + 0x74) = ASM_BRANCH(0x70);
+
+        // prevent boomerang from being given on room load
+        const uint32_t createInitAddr = reinterpret_cast<uint32_t>(libtp::tp::d_a_obj_item::CreateInit);
+        *reinterpret_cast<uint32_t*>(createInitAddr + 0x264) = ASM_BRANCH(0x10);
+
+        // Allow boomerang to rotate
+        const uint32_t modeWaitAddr = reinterpret_cast<uint32_t>(libtp::tp::d_a_obj_item::mode_wait);
+        *reinterpret_cast<uint32_t*>(modeWaitAddr + 0x78) = ASM_NOP;
+
+        // Modify checkGroundSpecialMode to patch twilight fog transforms
+        const uint32_t checkGroundAddress = reinterpret_cast<uint32_t>(libtp::tp::d_a_alink::checkGroundSpecialMode);
+        libtp::patch::writeBranchBL(checkGroundAddress + 0x4C, events::checkValidGroundTransform);
+
 #ifdef TP_JP
         uint32_t checkWarpStartAddress = reinterpret_cast<uint32_t>(libtp::tp::d_a_alink::checkWarpStart);
 

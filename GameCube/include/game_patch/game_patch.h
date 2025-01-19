@@ -18,11 +18,6 @@
 
 namespace mod::game_patch
 {
-#define TOTAL_FOOLISH_ITEM_MODELS 20
-    extern const uint8_t foolishModelItemList[TOTAL_FOOLISH_ITEM_MODELS];
-
-    extern uint8_t dungeonItemAreaColorIndex;
-
     // Special message ids that use values that are normally never used
     enum SpecialMessageIds
     {
@@ -48,7 +43,7 @@ namespace mod::game_patch
     /**
      * @brief Patches the unused itemFunc corresponding to the poe itemID
      */
-    void _00_poe(void);
+    void _00_poe();
     void _00_handle_poeItem();
 
     // 01 - Function definitions used for setting up the custom state function(s)
@@ -111,6 +106,7 @@ namespace mod::game_patch
     void _02_auruMemoItemFunc();
     void _02_ordonPumpkinItemFunc();
     void _02_ordonGoatCheeseItemFunc();
+    void _02_partlyFilledSkybookItemFunc();
     void _02_filledSkybookItemFunc();
     void _02_bigWalletItemFunc();
     void _02_giantWalletItemFunc();
@@ -131,11 +127,20 @@ namespace mod::game_patch
     void _02_greatSpinItemFunc();
     void _02_lanayruVesselItemFunc();
     void _02_foolishItemFunc();
-    int32_t _02_firstSkybookItemGetCheck();
-    int32_t _02_secondSkybookItemGetCheck();
-    int32_t _02_thirdSkybookItemGetCheck();
-    int32_t _02_fourthSkybookItemGetCheck();
-    int32_t _02_fifthSkybookItemGetCheck();
+    void _02_SFaronPortalItemFunc();
+    void _02_NFaronPortalItemFunc();
+    void _02_GorgePortalItemFunc();
+    void _02_KakVillagePortalItemFunc();
+    void _02_DeathMountainPortalItemFunc();
+    void _02_CastleTownPortalItemFunc();
+    void _02_ZorasDomainPortalItemFunc();
+    void _02_LakeHyliaPortalItemFunc();
+    void _02_GerudoDesertPortalItemFunc();
+    void _02_MirrorChamberPortalItemFunc();
+    void _02_SnowpeakPortalItemFunc();
+    void _02_SacredGrovePortalItemFunc();
+    void _02_EldinBridgePortalItemFunc();
+    void _02_UpperZoraRiverPortalItemFunc();
     int32_t _02_bigWalletItemGetCheck();
     int32_t _02_giantWalletItemGetCheck();
     int32_t _02_firstFusedShadowItemGetCheck();

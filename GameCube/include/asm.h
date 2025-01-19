@@ -19,14 +19,14 @@
 
 // Original: li 0xE0
 // Normally loads the poesoul item id into r4
-#define e_hp_ExecDead_liOffset 0x247C
+#define e_hp_ExecDead_beqOffset 0x2440
 #define e_po_ExecDead_liOffset 0x3C9C
 
 // Original:
-// stb r0, 0x10c( r4 ) = > numPoeSouls
-// Normally increments poe count
-#define e_hp_ExecDead_incOffset 0x2354
-#define e_po_ExecDead_incOffset 0x36A8
+// lis r3,dComIfG_gameInfo@h
+// Normally increments poe count if not at 255
+#define e_hp_ExecDead_incOffset 0x233C
+#define e_po_ExecDead_incOffset 0x3690
 
 // d_a_obj_Lv5Key__Wait_offset:
 // 0xBC is offset to the text section relative to the start of the decompressed
@@ -41,18 +41,17 @@ namespace mod::assembly
         int32_t asm_handle_snprintf(char* buffer, std::size_t bufferSize, const char* format, ...);
         int32_t asm_handle_vsnprintf(char* buffer, std::size_t bufferSize, const char* format, va_list args);
 
-        void asmDoLinkHookStart(void);
-        void asmDoLinkHookEnd(void);
+        void asmDoLinkHookStart();
+        void asmDoLinkHookEnd();
         void handleDoLinkHook(libtp::tp::dynamic_link::DynamicModuleControl* dmc);
 
         // d_e_hp.rel
-        void asmAdjustPoeItemStart(void);
-        void asmAdjustPoeItemEnd(void);
-        int32_t handleAdjustPoeItem(void*);
+        void asmAdjustPoeItem();
+        void handleAdjustPoeItem(void*);
 
         // d_e_po.rel
-        void asmAdjustAGPoeItemStart(void);
-        void asmAdjustAGPoeItemEnd(void);
+        void asmAdjustAGPoeItemStart();
+        void asmAdjustAGPoeItemEnd();
         int32_t handleAdjustAGPoeItem(void*);
 
         // d_a_npc_ins.rel
@@ -94,7 +93,7 @@ namespace mod::assembly
         bool handleCheck60PoeReward(uint8_t poeCount);
 
         // d_a_npc_GWolf.o
-        void asmReplaceGWolfWithItem(void);
+        void asmReplaceGWolfWithItem();
         bool handleReplaceGWolfWithItem(const int16_t* l_delFlag, void* daNpcGWolf);
 
         // d_a_obj_master_sword.o
@@ -104,6 +103,10 @@ namespace mod::assembly
 
         // vi.o
         void asmCallCodehandler();
+
+        // d_meter.o
+        void asmManageEquippedItemsAsWolf();
+        int32_t handleManageEquippedItemsAsWolf(int32_t status);
 
         // d_a_alink.o
 #ifdef TP_JP

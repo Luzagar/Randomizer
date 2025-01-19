@@ -1,5 +1,5 @@
-// This file should only be used for EU
-#ifdef TP_EU
+// This file should only be used for GC EU and Wii US 1.2
+#if defined TP_EU || defined TP_WUS2
 
 #include "customMessages.h"
 #include "tp/resource.h"
@@ -196,6 +196,23 @@ namespace mod::customMessages
         //s'en dégage..
         "\x73\x27\x65\x6e\x20\x64\xe9\x67\x61\x67\x65\x2e\x2e"
     MSG_END();
+        MSG_BEGIN_ARRAY(firstMirrorShardFr)
+        MSG_SPEED(MSG_SPEED_FAST)
+        // Vous obtenez le premier fragmentdu
+        "\x56\x6F\x75\x73\x20\x6F\x62\x74\x65\x6E\x65\x7A\x20\x6C\x65\x20\x70\x72\x65\x6D\x69\x65\x72\x20\x66\x72\x61\x67\x6D\x65\x6E\x74\x0A\x64\x75\x20"
+        MSG_COLOR(MSG_COLOR_RED)
+        // Miroir des Ombres
+        "\x4d\x69\x72\x6f\x69\x72\x20\x64\x65\x73\x20\x4f\x6d\x62\x72\x65\x73"
+        MSG_COLOR(MSG_COLOR_WHITE)
+        // ! Il est recouvert de
+        "\x21\x20\x49\x6C\x20\x65\x73\x74\x0A\x72\x65\x63\x6F\x75\x76\x65\x72\x74\x20\x64\x65\x20"
+        MSG_COLOR(MSG_COLOR_ORANGE)
+        // sable
+        "\x73\x61\x62\x6C\x65"
+        MSG_COLOR(MSG_COLOR_WHITE)
+        // ...
+        "\x2e\x2e\x2e"
+    MSG_END();
     MSG_BEGIN_ARRAY(secondMirrorShardFr)
         MSG_SPEED(MSG_SPEED_FAST)
         //Vous obtenez le second fragmentdu 
@@ -256,7 +273,7 @@ namespace mod::customMessages
         "\x62\x6c\x69\x7a\x7a\x61\x72\x64\x20"
         MSG_COLOR(MSG_COLOR_WHITE)
         //souffle..
-        "\x73\x6f\x75\x66\x66\x6c\x65\x2e\x2e"
+        "\x73\x6f\x75\x66\x66\x6c\x65\x2e\x2e\x2e"
     MSG_END();
     MSG_BEGIN_ARRAY(talkToMidnaFr)
         //Qu'est-ce qu'il y a, 
@@ -351,18 +368,9 @@ namespace mod::customMessages
         // pour l'instant.
         "\x20\x70\x6F\x75\x72\x20\x6C\x27\x69\x6E\x73\x74\x61\x6E\x74\x2E"
     MSG_END();
-    MSG_BEGIN_ARRAY(charloDonationFr)
-        // Pour que la paix règne en Hyrule... puis-je vous demander l'aumône...?
-        "\x50\x6F\x75\x72\x20\x71\x75\x65\x20\x6C\x61\x20\x70\x61\x69\x78\x20\x72\xE8\x67\x6E\x65\x20\x65\x6E\x20\x48\x79\x72\x75\x6C\x65\x2E\x2E\x2E\x0A\x70\x75\x69\x73\x2D\x6A\x65\x20\x76\x6F\x75\x73\x20\x64\x65\x6D\x61\x6E\x64\x65\x72\x20\x6C\x27\x61\x75\x6D\xF4\x6E\x65\x2E\x2E\x2E\x3F" 
-        MSG_OPTION_LIST(MSG_OPTION_1) 
-        // Voici 100 rubis.
-        "\x56\x6F\x69\x63\x69\x20\x31\x30\x30\x20\x72\x75\x62\x69\x73\x2E\x0A" 
-        MSG_OPTION_LIST(MSG_OPTION_2) 
-        // Voici 50 rubis
-        "\x56\x6F\x69\x63\x69\x20\x35\x30\x20\x72\x75\x62\x69\x73\x2E\x0A" 
-        MSG_OPTION_LIST(MSG_OPTION_3) 
-        // Je refuse.
-        "\x4A\x65\x20\x72\x65\x66\x75\x73\x65\x2E";
+    MSG_BEGIN_ARRAY(spawnTextFr)
+        "Return to Spawn"
+        MSG_ICON(MSG_ICON_Z)
     MSG_END();
 
     MSG_BEGIN_ARRAY(recognitionFr)
@@ -441,7 +449,7 @@ namespace mod::customMessages
         // First Ancient Sky Book character
         skyBookCharacterFr,
         sizeof(skyBookCharacterFr),
-        0x013F,
+        0x014E,
 
         // First Fused Shadow
         firstFusedShadowFr,
@@ -457,6 +465,11 @@ namespace mod::customMessages
         thirdFusedShadowFr,
         sizeof(thirdFusedShadowFr),
         0x013E,
+
+        // First Mirror Shard
+        firstMirrorShardFr,
+        sizeof(firstMirrorShardFr),
+        0x0B7,
 
         // Second Mirror Shard
         secondMirrorShardFr,
@@ -517,6 +530,11 @@ namespace mod::customMessages
         skyBookDescriptionFr,
         sizeof(skyBookDescriptionFr),
         0x34d,
+
+        // Spawn text
+        spawnTextFr,
+        sizeof(spawnTextFr),
+        0x555,
 
         // Recognition text
         recognitionFr,
@@ -602,7 +620,6 @@ namespace mod::customMessages
     };
 
     const uint32_t totalCustomMessagesFr = sizeof(entriesFr) / sizeof(MsgEntry);
-    const MsgEntry charloDonationEntryFr = {charloDonationFr, sizeof(charloDonationFr), 0x0355};
 
     const ItemWheelMenuStrings itemWheelMenuStringsFr = {
         // areasBeingTracked
@@ -655,10 +672,6 @@ namespace mod::customMessages
         // seedIsLoaded
         // Seed
         "\x53\x65\x65\x64",
-
-        // seedIsNotLoaded
-        // Aucune seed n'est chargée
-        "\x41\x75\x63\x75\x6E\x65\x20\x73\x65\x65\x64\x20\x6E\x27\x65\x73\x74\x20\x63\x68\x61\x72\x67\xE9\x65",
 
         // yes/no
         // Oui

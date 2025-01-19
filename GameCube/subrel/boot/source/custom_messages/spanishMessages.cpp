@@ -1,5 +1,5 @@
-// This file should only be used for EU
-#ifdef TP_EU
+// This file should only be used for GC EU and Wii US 1.2
+#if defined TP_EU || defined TP_WUS2
 
 #include "customMessages.h"
 #include "tp/resource.h"
@@ -208,6 +208,23 @@ namespace mod::customMessages
         // y huele\na pescado..
         "\x79\x20\x68\x75\x65\x6C\x65\x0A\x61\x20\x70\x65\x73\x63\x61\x64\x6F\x2E\x2E"
     MSG_END();
+    MSG_BEGIN_ARRAY( firstMirrorShardSp )
+        MSG_SPEED(MSG_SPEED_FAST)
+        // ¡Has obtenido el primer\nfragmento del 
+        "\xA1\x48\x61\x73\x20\x6F\x62\x74\x65\x6E\x69\x64\x6F\x20\x65\x6C\x20\x70\x72\x69\x6D\x65\x72\x0A\x66\x72\x61\x67\x6D\x65\x6E\x74\x6F\x20\x64\x65\x6C\x20"
+        MSG_COLOR(MSG_COLOR_RED)
+        // Espejo del\nCrepúsculo
+        "\x45\x73\x70\x65\x6A\x6F\x20\x64\x65\x6C\x0A\x43\x72\x65\x70\xFA\x73\x63\x75\x6C\x6F"
+        MSG_COLOR(MSG_COLOR_WHITE)
+        // ! Está cubierto de\n
+        "\x21\x20\x45\x73\x74\xE1\x20\x63\x75\x62\x69\x65\x72\x74\x6F\x20\x64\x65\x0A"
+        MSG_COLOR(MSG_COLOR_LIGHT_BLUE)
+        // arena 
+        "\x61\x72\x65\x6E\x61"
+        MSG_COLOR(MSG_COLOR_WHITE)
+        // ..
+        "\x2E\x2E"
+    MSG_END();
     MSG_BEGIN_ARRAY( secondMirrorShardSp )
         MSG_SPEED(MSG_SPEED_FAST)
         // ¡Has obtenido el segundo\nfragmento del 
@@ -268,7 +285,7 @@ namespace mod::customMessages
         "\x66\x72\xED\x6F"
         MSG_COLOR(MSG_COLOR_WHITE)
         // ..
-        "\x2E\x2E"
+        "\x2E\x2E\x2E"
     MSG_END();
     MSG_BEGIN_ARRAY( talkToMidnaSp )
         // ¿Qué quieres, 
@@ -363,18 +380,9 @@ namespace mod::customMessages
         // hasta ahora.
         "\x20\x68\x61\x73\x74\x61\x20\x61\x68\x6f\x72\x61\x2e"
     MSG_END();
-    MSG_BEGIN_ARRAY( charloDonationSp )
-        // ¿Darme una limosna por la paz de Hyrule?
-        "\xBF\x44\x61\x72\x6D\x65\x20\x75\x6E\x61\x20\x6C\x69\x6D\x6F\x73\x6E\x61\x20\x70\x6F\x72\x20\x6C\x61\x20\x70\x61\x7A\x0A\x64\x65\x20\x48\x79\x72\x75\x6C\x65\x3F" 
-        MSG_OPTION_LIST( MSG_OPTION_1 ) 
-        // 100 rupias
-        "\x31\x30\x30\x20\x72\x75\x70\x69\x61\x73\x0A" 
-        MSG_OPTION_LIST( MSG_OPTION_2 ) 
-        // 50 rupias
-        "\x35\x30\x20\x72\x75\x70\x69\x61\x73\x0A" 
-        MSG_OPTION_LIST( MSG_OPTION_3 ) 
-        // No
-        "\x4E\x6F";
+    MSG_BEGIN_ARRAY(spawnTextSp)
+        "Return to Spawn"
+        MSG_ICON(MSG_ICON_Z)
     MSG_END();
     MSG_BEGIN_ARRAY( recognitionSp )
         MSG_SPEED(MSG_SPEED_FAST)
@@ -452,7 +460,7 @@ namespace mod::customMessages
         // First Ancient Sky Book character
         skyBookCharacterSp,
         sizeof(skyBookCharacterSp),
-        0x013F,
+        0x014E,
 
         // First Fused Shadow
         firstFusedShadowSp,
@@ -468,6 +476,11 @@ namespace mod::customMessages
         thirdFusedShadowSp,
         sizeof(thirdFusedShadowSp),
         0x013E,
+
+        // First Mirror Shard
+        firstMirrorShardSp,
+        sizeof(firstMirrorShardSp),
+        0x0B7,
 
         // Second Mirror Shard
         secondMirrorShardSp,
@@ -528,6 +541,11 @@ namespace mod::customMessages
         skyBookDescriptionSp,
         sizeof(skyBookDescriptionSp),
         0x34d,
+
+        // Spawn text
+        spawnTextSp,
+        sizeof(spawnTextSp),
+        0x555,
 
         // Recognition text
         recognitionSp,
@@ -613,7 +631,6 @@ namespace mod::customMessages
     };
 
     const uint32_t totalCustomMessagesSp = sizeof(entriesSp) / sizeof(MsgEntry);
-    const MsgEntry charloDonationEntrySp = {charloDonationSp, sizeof(charloDonationSp), 0x0355};
 
     const ItemWheelMenuStrings itemWheelMenuStringsSp = {
         // areasBeingTracked
@@ -665,11 +682,6 @@ namespace mod::customMessages
 
         // seedIsLoaded
         "Seed",
-
-        // seedIsNotLoaded
-        // Ninguna seed está cargada actualmente
-        "\x4E\x69\x6E\x67\x75\x6E\x61\x20\x73\x65\x65\x64\x20\x65\x73\x74\xE1\x20\x63\x61\x72\x67\x61\x64\x61\x20\x61\x63\x74"
-        "\x75\x61\x6C\x6D\x65\x6E\x74\x65",
 
         // yes/no
         // Sí
