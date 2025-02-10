@@ -12,45 +12,34 @@ namespace mod::game_patch
     void _07_checkPlayerStageReturn()
     {
         using namespace libtp::tp::d_com_inf_game;
+        using namespace libtp::tp::d_a_alink;
+        using namespace libtp::tp;
         using namespace libtp::data;
 
-        // If we are in the desert and cannot transform/warp, we set link's save point to Lake Hylia.
-        const auto stagesPtr = &stage::allStages[0];
-
-        libtp::tp::d_save::dSv_player_c* playerPtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player;
-        libtp::tp::d_save::dSv_player_return_place_c* playerReturnPlacePtr = &playerPtr->player_return_place;
-
-        // If for some reason we find ourselves outside Sacred Grove and cannot transform/warp, we want the player to be able to
-        // save warp to Faron. This is mostly usefull for Glitched Logic.
-        if (libtp::tools::playerIsInRoomStage(6, stagesPtr[stage::StageIDs::Faron_Woods]))
+        // If we are not in a dungeon, we want to set our save warp to be the last entrance we entered.
+        // As we randomize Boss/midboss rooms, this will have to be adjusted accordingly.
+        if (!checkDungeon() && !checkBossRoom() && !checkStageName(stage::allStages[stage::StageIDs::Cave_of_Ordeals]))
         {
-            if (!events::haveItem(items::Shadow_Crystal))
+            d_save::dSv_player_c* playerPtr = &d_com_inf_game::dComIfG_gameInfo.save.save_file.player;
+            d_save::dSv_player_return_place_c* playerReturnPlacePtr = &playerPtr->player_return_place;
+            d_stage::dStage_startStage* startStgPtr = &d_com_inf_game::dComIfG_gameInfo.play.mStartStage;
+            uint16_t startPoint = d_com_inf_game::dComIfG_gameInfo.save.mRestart.mStartPoint;
+
+            if (startPoint == 0xFFFC) // Portal
             {
-                strncpy(playerReturnPlacePtr->link_current_stage,
-                        stagesPtr[stage::StageIDs::Faron_Woods],
-                        sizeof(playerReturnPlacePtr->link_current_stage) - 1);
-
-                playerReturnPlacePtr->link_spawn_point_id = 0xFE;
-                playerReturnPlacePtr->link_room_id = 0x6;
+                playerReturnPlacePtr->link_spawn_point_id = 0; // Just set the spawn to 0 so that the player has a valid spawn
+                                                               // location since you can't load a save from a portal spawn.
             }
-        }
-        else if (libtp::tp::d_a_alink::checkStageName(stagesPtr[stage::StageIDs::Fyrus]))
-        {
+            else
+            {
+                playerReturnPlacePtr->link_spawn_point_id = startPoint;
+            }
+
             strncpy(playerReturnPlacePtr->link_current_stage,
-                    stagesPtr[stage::StageIDs::Goron_Mines],
+                    startStgPtr->mStage,
                     sizeof(playerReturnPlacePtr->link_current_stage) - 1);
 
-            playerReturnPlacePtr->link_spawn_point_id = 0x0;
-            playerReturnPlacePtr->link_room_id = 0x1;
-        }
-        else if (libtp::tp::d_a_alink::checkStageName(stagesPtr[stage::StageIDs::Argorok]))
-        {
-            strncpy(playerReturnPlacePtr->link_current_stage,
-                    stagesPtr[stage::StageIDs::City_in_the_Sky],
-                    sizeof(playerReturnPlacePtr->link_current_stage) - 1);
-
-            playerReturnPlacePtr->link_spawn_point_id = 0x0;
-            playerReturnPlacePtr->link_room_id = 0x0;
+            playerReturnPlacePtr->link_room_id = startStgPtr->mRoomNo;
         }
     }
 } // namespace mod::game_patch
