@@ -46,6 +46,9 @@ namespace mod::events
     extern const libtp::tp::dzx::ACTR SignActr;
     extern const libtp::tp::dzx::ACTR gMstrSrdActr;
     extern const libtp::tp::dzx::ACTR gCoroActr;
+    extern const libtp::tp::dzx::ACTR gGateActr;
+    extern const libtp::tp::dzx::ACTR gShadowBeastActr;
+    extern const libtp::tp::dzx::ACTR gShadowBeastActr;
 
     /**
      * @brief Runs when loading just started

@@ -100,6 +100,17 @@ namespace mod::events
 
     const libtp::tp::dzx::ACTR gMstrSrdActr = {"mstrsrd", 0x000020110, 0.f, 1700.f, -5435.f, 0x147, 0x0, 0x0, 0xFFFF};
 
+    // gate Actors
+    const libtp::tp::dzx::ACTR gGateActr =
+        {"IGateL", 0x00000F23, -12350.f, -170.f, -17620.f, 0, static_cast<int16_t>(0xEAAB), 0, 0xFFFF};
+
+    // Shadow beast
+    const libtp::tp::dzx::ACTR gShadowBeastActr =
+        {"E_s1", 0x02FF0B20, -35298.3f, 300.0f, -17067.0f, 0, static_cast<int16_t>(0x7CDD), 0, 0xFFFF};
+
+    const libtp::tp::dzx::ACTR gBackgroundObj =
+        {"mvbg_a", 0x1FE0004D, -48008.0f, -9399.0f, 52620.0f, 0x0000, 0x6553, 0x0000, 0xFFFF};
+
     void onLoad(rando::Randomizer* randomizer)
     {
         randomizer->onStageLoad();
@@ -1165,7 +1176,10 @@ namespace mod::events
         using namespace libtp::data::stage;
 
         tp::dzx::ACTR localSignActor;
+        tp::dzx::ACTR localBackgroundObj;
+
         memcpy(&localSignActor, &gSignActor, sizeof(tp::dzx::ACTR));
+        memcpy(&localBackgroundObj, &gBackgroundObj, sizeof(tp::dzx::ACTR));
 
         const int32_t roomIDX = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mEvtManager.mRoomNo;
         switch (randomizer->getSeedPtr()->getStageIDX())
@@ -1232,6 +1246,18 @@ namespace mod::events
                     localSignActor.pos.z = 81859.2891f;
                     localSignActor.rot[1] = static_cast<int16_t>(0x8000);
                     tools::spawnActor(6, localSignActor);
+                    tools::spawnActor(6, gBackgroundObj);
+                    localBackgroundObj.pos.x = -48247.0039f;
+                    localBackgroundObj.pos.z = 52382.8555;
+                    localBackgroundObj.rot[1] = static_cast<int16_t>(0x11C7);
+                    tools::spawnActor(6,localBackgroundObj);
+                    localBackgroundObj.pos.x = -47797.168f;
+                    localBackgroundObj.pos.z = 52893.8203f;
+                    tools::spawnActor(6,localBackgroundObj);
+
+
+
+
                 }
 
                 if (roomIDX == 3) // Kakariko Gorge
@@ -1275,10 +1301,42 @@ namespace mod::events
 
             case StageIDs::Faron_Woods:
             {
+                tp::dzx::ACTR localShadowBeastActr;
+                memcpy(&localShadowBeastActr, &gShadowBeastActr, sizeof(tp::dzx::ACTR));
+
                 if (tp::d_save::isEventBit(&tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.mEvent,
                                            data::flags::ORDON_DAY_2_OVER))
                 {
                     tools::spawnActor(6, gForestGWolfActr);
+                }
+
+                if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x3))
+                {
+                    tools::spawnActor(6, localShadowBeastActr);
+                    localShadowBeastActr.pos.x = -35186.7f;
+                    localShadowBeastActr.pos.z = -15137.6f;
+                    tools::spawnActor(6, localShadowBeastActr);
+                    localShadowBeastActr.pos.x = -36159.1f;
+                    localShadowBeastActr.pos.z = -16896.0f;
+                    tools::spawnActor(6, localShadowBeastActr);
+                }
+
+                if (roomIDX == 0)
+                {
+                    if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x47))
+                    {
+                        localShadowBeastActr.parameters = 0x47FF0A00;
+                        localShadowBeastActr.pos.x = -16057.1;
+                        localShadowBeastActr.pos.y = 0.f;
+                        localShadowBeastActr.pos.z = 36.3f;
+                        tools::spawnActor(0, localShadowBeastActr);
+                        localShadowBeastActr.pos.x = -15412.6f;
+                        localShadowBeastActr.pos.z = -350.3f;
+                        tools::spawnActor(0, localShadowBeastActr);
+                        localShadowBeastActr.pos.x = -15256.3f;
+                        localShadowBeastActr.pos.z = 262.f;
+                        tools::spawnActor(0, localShadowBeastActr);
+                    }
                 }
 
                 if (roomIDX == 4)
@@ -1295,6 +1353,17 @@ namespace mod::events
                                                data::flags::ORDON_DAY_2_OVER))
                     {
                         tools::spawnActor(4, gCoroActr);
+                    }
+                    if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC))
+                    {
+                        tp::dzx::ACTR localGateActor;
+                        memcpy(&localGateActor, &gGateActr, sizeof(tp::dzx::ACTR));
+                        tools::spawnActor(4, localGateActor);
+                        localGateActor.parameters = 0x00000F22;
+                        localGateActor.pos.x = -11950.f;
+                        localGateActor.pos.z = -17390.f;
+                        localGateActor.rot[1] = 0x6AAA;
+                        tools::spawnActor(4, localGateActor);
                     }
                 }
                 break;
