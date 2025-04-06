@@ -1211,12 +1211,10 @@ namespace mod::events
                 tools::spawnActor(0, localShadowBeastActr);
                 localShadowBeastActr.pos.x = -102927.2f;
                 localShadowBeastActr.pos.z = 54554.9f;
-                tools::spawnActor(0,localShadowBeastActr);
+                tools::spawnActor(0, localShadowBeastActr);
                 localShadowBeastActr.pos.x = -102188.6f;
                 localShadowBeastActr.pos.z = 53401.9f;
-                tools::spawnActor(0,localShadowBeastActr);
-
-
+                tools::spawnActor(0, localShadowBeastActr);
 
                 if (roomIDX == 1) // Lanayru Spring
                 {
@@ -1265,14 +1263,10 @@ namespace mod::events
                     localBackgroundObj.pos.x = -48247.0039f;
                     localBackgroundObj.pos.z = 52382.8555;
                     localBackgroundObj.rot[1] = static_cast<int16_t>(0x11C7);
-                    tools::spawnActor(6,localBackgroundObj);
+                    tools::spawnActor(6, localBackgroundObj);
                     localBackgroundObj.pos.x = -47797.168f;
                     localBackgroundObj.pos.z = 52893.8203f;
-                    tools::spawnActor(6,localBackgroundObj);
-
-
-
-
+                    tools::spawnActor(6, localBackgroundObj);
                 }
 
                 if (roomIDX == 3) // Kakariko Gorge
@@ -1286,14 +1280,13 @@ namespace mod::events
                     localShadowBeastActr.pos.x = -10049.4f;
                     localShadowBeastActr.pos.y = -7200.f;
                     localShadowBeastActr.pos.z = 57901.1f;
-                    tools::spawnActor(3,localShadowBeastActr);
+                    tools::spawnActor(3, localShadowBeastActr);
                     localShadowBeastActr.pos.x = -10050.f;
                     localShadowBeastActr.pos.z = 58601.3f;
-                    tools::spawnActor(3,localShadowBeastActr);
+                    tools::spawnActor(3, localShadowBeastActr);
                     localShadowBeastActr.pos.x = -9351.2f;
                     localShadowBeastActr.pos.z = 58899.6f;
-                    tools::spawnActor(3,localShadowBeastActr);                
-
+                    tools::spawnActor(3, localShadowBeastActr);
                 }
 
                 if (roomIDX == 7) // North Eldin Hint Sign
@@ -1432,14 +1425,14 @@ namespace mod::events
                 localShadowBeastActr.parameters = 0x1FFF0800;
                 localShadowBeastActr.pos.x = -2802.2f;
                 localShadowBeastActr.pos.y = 0.3f;
-                localShadowBeastActr.pos.z= 7901.6f;
-                tools::spawnActor(0,localShadowBeastActr);
+                localShadowBeastActr.pos.z = 7901.6f;
+                tools::spawnActor(0, localShadowBeastActr);
                 localShadowBeastActr.pos.x = -2573.8f;
-                localShadowBeastActr.pos.z= 7274.3f;
-                tools::spawnActor(0,localShadowBeastActr);
+                localShadowBeastActr.pos.z = 7274.3f;
+                tools::spawnActor(0, localShadowBeastActr);
                 localShadowBeastActr.pos.x = -1329.8f;
-                localShadowBeastActr.pos.z= 6012.4f;
-                tools::spawnActor(0,localShadowBeastActr);
+                localShadowBeastActr.pos.z = 6012.4f;
+                tools::spawnActor(0, localShadowBeastActr);
                 break;
             }
 
@@ -1454,11 +1447,18 @@ namespace mod::events
                     localSignActor.pos.z = -1424.16f;
                     localSignActor.rot[1] = static_cast<int16_t>(0xA019);
                     tools::spawnActor(1, localSignActor);
-                    localShadowBeastActr.parameters = 0x34FF1EF0;
-                    localShadowBeastActr.pos.x = -3838.74f;
-                    localShadowBeastActr.pos.y = 230.f;
-                    localShadowBeastActr.pos.z = -9605.98f;
                 }
+                break;
+            }
+
+            case StageIDs::Ordon_Spring:
+            {
+                localShadowBeastActr.parameters = 0x34FF1EF0;
+                localShadowBeastActr.pos.x = -3838.74f;
+                localShadowBeastActr.pos.y = 230.f;
+                localShadowBeastActr.pos.z = -9605.98f;
+                tools::spawnActor(1, localShadowBeastActr);
+
                 break;
             }
 
@@ -1494,6 +1494,20 @@ namespace mod::events
                 localSignActor.pos.z = 1227.39978f;
                 localSignActor.rot[1] = static_cast<int16_t>(0x35A5);
                 tools::spawnActor(0, localSignActor);
+                localShadowBeastActr.parameters = 0x15FF0C00;
+                localShadowBeastActr.pos.x = 3938.7f;
+                localShadowBeastActr.pos.y = -1000.f;
+                localShadowBeastActr.pos.z = -2703.f;
+                tools::spawnActor(3, localShadowBeastActr);
+                localShadowBeastActr.pos.x = 4492.8f;
+                localShadowBeastActr.pos.z = -2428.6f;
+                tools::spawnActor(3, localShadowBeastActr);
+                localShadowBeastActr.pos.x = 2194.9f;
+                localShadowBeastActr.pos.z = -2954.7f;
+                tools::spawnActor(3, localShadowBeastActr);
+                localShadowBeastActr.pos.x = 1140.9f;
+                localShadowBeastActr.pos.z = -3783.3f;
+                tools::spawnActor(3, localShadowBeastActr);
                 break;
             }
 
@@ -1520,14 +1534,13 @@ namespace mod::events
                     localShadowBeastActr.pos.x = -71226.9f;
                     localShadowBeastActr.pos.y = -1400.f;
                     localShadowBeastActr.pos.z = 10602.7f;
-                    tools::spawnActor(8,localShadowBeastActr);
+                    tools::spawnActor(8, localShadowBeastActr);
                     localShadowBeastActr.pos.x = -68988.7f;
                     localShadowBeastActr.pos.z = 11441.8f;
-                    tools::spawnActor(8,localShadowBeastActr);
+                    tools::spawnActor(8, localShadowBeastActr);
                     localShadowBeastActr.pos.x = -69502.1f;
                     localShadowBeastActr.pos.z = 10213.2f;
-                    tools::spawnActor(8,localShadowBeastActr);
-
+                    tools::spawnActor(8, localShadowBeastActr);
                 }
                 else if (roomIDX == 16) // South of CT
                 {
@@ -1567,11 +1580,14 @@ namespace mod::events
                 localSignActor.pos.z = 17146.2676f;
                 localSignActor.rot[1] = static_cast<int16_t>(0xAF09);
                 tools::spawnActor(1, localSignActor);
-                localShadowBeastActr.parameters = 0xCA000000;
-                localShadowBeastActr.pos.x = -1524.1f;
-                localShadowBeastActr.pos.y = -7.7f;
+                localShadowBeastActr.parameters = 0x02FF0800;
+                localShadowBeastActr.pos.x = -1820.3f;
+                localShadowBeastActr.pos.y = -9.7f;
                 localShadowBeastActr.pos.z = -4405.8f;
-
+                tools::spawnActor(0, localShadowBeastActr);
+                localShadowBeastActr.pos.x = -2402.5f;
+                localShadowBeastActr.pos.z = -3133.2;
+                tools::spawnActor(0, localShadowBeastActr);
                 break;
             }
 

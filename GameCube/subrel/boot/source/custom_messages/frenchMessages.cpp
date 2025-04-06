@@ -695,7 +695,7 @@ namespace mod::customMessages
 
         // Gate Keys
         // Clés des portails
-        "\x43\x6C\xE9\x73\x20\x64\x65\x73\x20\x70\x6F\x72\x74\x61\x69\x6C\x73",
+        "\x47\x61\x74\x65\x20\x4B\x65\x79\x73",
 
         // Areas
         // Zones

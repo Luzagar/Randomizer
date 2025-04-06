@@ -677,6 +677,11 @@ namespace mod
                 if ((stageIDX == currentEntrance->getOrigStageIDX()) && (roomNo == currentEntrance->getOrigRoomIDX()) &&
                     (point == currentEntrance->getOrigSpawn()) && (layer == currentEntrance->getOrigState()))
                 {
+                    if(currentEntrance->getNewStageIDX() == libtp::data::stage::Ganondorf_Castle)
+                    {
+                       libtp::tp::d_save::dSv_info_c* savePtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save;
+                        savePtr->save_file.player.player_status_a.currentForm = 0;
+                    }
                     // getConsole() << "Shuffling Entrance\n";
 
                     return gReturn_dComIfGp_setNextStage(libtp::data::stage::allStages[currentEntrance->getNewStageIDX()],

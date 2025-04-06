@@ -422,6 +422,8 @@ namespace mod::game_patch
     KEEP_FUNC void _02_faronCoroKeyItemFunc()
     {
         libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC); // Unlock Coro Gate
+        const libtp::data::stage::AreaNodesID nodeId = libtp::data::stage::AreaNodesID::Faron;
+        giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Small_Key);
     }
 
     KEEP_FUNC void _02_shadowCrystalItemFunc()
