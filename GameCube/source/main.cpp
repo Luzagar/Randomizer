@@ -1941,7 +1941,7 @@ namespace mod
 
         if (ret)
         {
-            if (checkButtonsHeld(PadInputs::Button_R))
+            if (true)
             {
                 *heavyStateSpeedPtr = 1.f;
             }
