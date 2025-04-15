@@ -1941,13 +1941,13 @@ namespace mod
 
         if (ret)
         {
-            if (true)
+            if (checkButtonsHeld(PadInputs::Button_R))
             {
-                *heavyStateSpeedPtr = 1.f;
+                *heavyStateSpeedPtr = 0.4f;
             }
             else
             {
-                *heavyStateSpeedPtr = 0.4f;
+                *heavyStateSpeedPtr = 1.f;
             }
         }
 
