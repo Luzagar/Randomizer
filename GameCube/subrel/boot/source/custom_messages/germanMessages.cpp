@@ -1,5 +1,5 @@
-// This file should only be used for EU
-#ifdef TP_EU
+// This file should only be used for GC EU and Wii US 1.2
+#if defined TP_EU || defined TP_WUS2
 
 #include "customMessages.h"
 #include "tp/resource.h"
@@ -362,18 +362,9 @@ namespace mod::customMessages
         // gesammelt.
         "\x20\x67\x65\x73\x61\x6d\x6d\x65\x6c\x74\x2e"
     MSG_END();
-    MSG_BEGIN_ARRAY(charloDonationDe)
-        // ...eine kleine Spende? Für den Frieden in Hyrule?
-        "\x2E\x2E\x2E\x65\x69\x6E\x65\x20\x6B\x6C\x65\x69\x6E\x65\x20\x53\x70\x65\x6E\x64\x65\x3F\x0A\x46\xFC\x72\x20\x64\x65\x6E\x20\x46\x72\x69\x65\x64\x65\x6E\x20\x69\x6E\x20\x48\x79\x72\x75\x6C\x65\x3F"
-        MSG_OPTION_LIST(MSG_OPTION_1) 
-        // 100 Rubine
-        "\x31\x30\x30\x20\x52\x75\x62\x69\x6E\x65\x0A" 
-        MSG_OPTION_LIST(MSG_OPTION_2) 
-        // 50 Rubine
-        "\x35\x30\x20\x52\x75\x62\x69\x6E\x65\x0A" 
-        MSG_OPTION_LIST(MSG_OPTION_3) 
-        // Nein danke!
-        "\x4E\x65\x69\x6E\x20\x64\x61\x6E\x6B\x65\x21";
+    MSG_BEGIN_ARRAY(spawnTextDe)
+        "Return to Spawn"
+        MSG_ICON(MSG_ICON_Z)
     MSG_END();
     MSG_BEGIN_ARRAY(recognitionDe)
         MSG_SPEED(MSG_SPEED_FAST)
@@ -452,7 +443,7 @@ namespace mod::customMessages
         // First Ancient Sky Book character
         skyBookCharacterDe,
         sizeof(skyBookCharacterDe),
-        0x013F,
+        0x014E,
 
         // First Fused Shadow
         firstFusedShadowDe,
@@ -533,6 +524,11 @@ namespace mod::customMessages
         skyBookDescriptionDe,
         sizeof(skyBookDescriptionDe),
         0x34d,
+
+        // Spawn text
+        spawnTextDe,
+        sizeof(spawnTextDe),
+        0x555,
 
         // Recognition text
         recognitionDe,
@@ -623,7 +619,6 @@ namespace mod::customMessages
     };
 
     const uint32_t totalCustomMessagesDe = sizeof(entriesDe) / sizeof(MsgEntry);
-    const MsgEntry charloDonationEntryDe = {charloDonationDe, sizeof(charloDonationDe), 0x0355};
 
     const ItemWheelMenuStrings itemWheelMenuStringsDe = {
         // areasBeingTracked
@@ -676,10 +671,6 @@ namespace mod::customMessages
         // seedIsLoaded
         // Seed
         "\x53\x65\x65\x64",
-
-        // seedIsNotLoaded
-        // Kein Seed geladen
-        "\x4B\x65\x69\x6E\x20\x53\x65\x65\x64\x20\x67\x65\x6C\x61\x64\x65\x6E",
 
         // yes/no
         // Ja

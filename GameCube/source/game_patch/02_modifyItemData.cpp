@@ -20,29 +20,6 @@
 
 namespace mod::game_patch
 {
-    const uint8_t foolishModelItemList[TOTAL_FOOLISH_ITEM_MODELS] = {
-        libtp::data::items::Magic_Armor,
-        libtp::data::items::Master_Sword,
-        libtp::data::items::Ordon_Shield,
-        libtp::data::items::Hylian_Shield,
-        libtp::data::items::Shadow_Crystal,
-        libtp::data::items::Coral_Earring,
-        libtp::data::items::Hawkeye,
-        libtp::data::items::Boomerang,
-        libtp::data::items::Spinner,
-        libtp::data::items::Ball_and_Chain,
-        libtp::data::items::Heros_Bow,
-        libtp::data::items::Clawshot,
-        libtp::data::items::Iron_Boots,
-        libtp::data::items::Dominion_Rod,
-        libtp::data::items::Master_Sword_Light,
-        libtp::data::items::Fishing_Rod,
-        libtp::data::items::Slingshot,
-        libtp::data::items::Dominion_Rod_Uncharged,
-        libtp::data::items::Empty_Bomb_Bag,
-        libtp::data::items::Ancient_Sky_Book_Empty,
-    };
-
     void giveNodeDungeonItems(const libtp::data::stage::AreaNodesID nodeId, const libtp::data::items::NodeDungeonItemType type)
     {
         using namespace libtp::data::items;
@@ -98,10 +75,10 @@ namespace mod::game_patch
         }
     }
 
-    uint32_t getFoolishModelRandomIndex(uint8_t* foolishModelIndexes, uint32_t loopCurrentCount)
+    uint32_t getFoolishModelRandomIndex(rando::Randomizer* randomizer, uint8_t* foolishModelIndexes, uint32_t loopCurrentCount)
     {
-        constexpr uint32_t modelListSize = sizeof(foolishModelItemList) / sizeof(foolishModelItemList[0]);
-        uint32_t randomIndex = libtp::tools::ulRand(&randState, modelListSize);
+        uint32_t* randStatePtr = randomizer->getRandStatePtr();
+        uint32_t randomIndex = libtp::tools::ulRand(randStatePtr, TOTAL_FOOLISH_ITEM_MODELS);
 
         uint32_t i = 0;
         while (i < loopCurrentCount)
@@ -110,7 +87,7 @@ namespace mod::game_patch
             if (randomIndex == foolishModelIndexes[i])
             {
                 // Get a new index and restart the loop
-                randomIndex = libtp::tools::ulRand(&randState, modelListSize);
+                randomIndex = libtp::tools::ulRand(randStatePtr, TOTAL_FOOLISH_ITEM_MODELS);
                 i = 0;
                 continue;
             }
@@ -125,18 +102,22 @@ namespace mod::game_patch
     {
         // Set the field model of the Foolish Item ID to the model of a random important item.
         libtp::tp::d_item_data::FieldItemRes* fieldItemResPtr = &libtp::tp::d_item_data::field_item_res[0];
-        rando::customItems::FoolishItems* foolishItemsPtr = &rando::foolishItems;
+        rando::Randomizer* randoPtr = rando::gRandomizer;
+        rando::customItems::FoolishItems* foolishItemsPtr = randoPtr->getFoolishItemsPtr();
 
-        const uint8_t* foolishItemIds = foolishItemsPtr->itemIds;
-        uint8_t* itemModelIds = foolishItemsPtr->itemModelId;
+        const uint8_t* foolishItemIds = foolishItemsPtr->getItemIdsPtr();
+        uint8_t* itemModelIds = foolishItemsPtr->getItemModelIdsPtr();
 
         constexpr uint32_t loopCount = MAX_SPAWNED_FOOLISH_ITEMS;
         uint8_t foolishModelIndexes[loopCount];
 
         for (uint32_t i = 0; i < loopCount; i++)
         {
-            const uint32_t randomIndex = getFoolishModelRandomIndex(foolishModelIndexes, i);
-            const uint32_t fieldModelItemID = _04_verifyProgressiveItem(randomizer, foolishModelItemList[randomIndex]);
+            const uint32_t randomIndex = getFoolishModelRandomIndex(randoPtr, foolishModelIndexes, i);
+
+            const uint32_t fieldModelItemID =
+                _04_verifyProgressiveItem(randoPtr, foolishItemsPtr->getSourceItemModelIdsPtr()[randomIndex]);
+
             itemModelIds[i] = static_cast<uint8_t>(fieldModelItemID);
 
             libtp::tp::d_item_data::FieldItemRes* currentFieldItemPtr = &fieldItemResPtr[foolishItemIds[i]];
@@ -154,8 +135,11 @@ namespace mod::game_patch
         using namespace libtp::tp::d_a_shop_item_static;
 
         // Set the shop model of the Foolish Item ID to the model of a random important item.
-        const uint32_t randomIndex = getFoolishModelRandomIndex(foolishModelIndexes, loopCurrentCount);
-        const uint32_t shopModelItemID = _04_verifyProgressiveItem(randomizer, foolishModelItemList[randomIndex]);
+        rando::Randomizer* randoPtr = rando::gRandomizer;
+        const uint32_t randomIndex = getFoolishModelRandomIndex(randoPtr, foolishModelIndexes, loopCurrentCount);
+
+        const uint32_t shopModelItemID =
+            _04_verifyProgressiveItem(randoPtr, randoPtr->getFoolishItemsPtr()->getSourceItemModelIdsPtr()[randomIndex]);
 
         libtp::tp::d_item_data::ItemResource* fieldItemResPtr = &libtp::tp::d_item_data::item_resource[shopModelItemID];
         ShopItemData* shopItemDataPtr = &shopItemData[shopID];
@@ -178,7 +162,7 @@ namespace mod::game_patch
         using namespace libtp::tp::d_a_shop_item_static;
 
         ShopItemData* shopItemDataPtr = &shopItemData[shopID];
-        const uint32_t shopModelItemID = _04_verifyProgressiveItem(randomizer, itemID);
+        const uint32_t shopModelItemID = _04_verifyProgressiveItem(rando::gRandomizer, itemID);
 
         switch (shopModelItemID)
         {
@@ -431,8 +415,13 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_faronSmallKeyItemFunc()
     {
-        const libtp::data::stage::AreaNodesID nodeId = libtp::data::stage::AreaNodesID::Faron;
-        giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Small_Key);
+        libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron),
+                                                          0x14); // Unlock North Faron Gate
+    }
+
+    KEEP_FUNC void _02_faronCoroKeyItemFunc()
+    {
+        libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC); // Unlock Coro Gate
     }
 
     KEEP_FUNC void _02_shadowCrystalItemFunc()
@@ -458,46 +447,29 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_ordonPumpkinItemFunc()
     {
-        events::setSaveFileEventFlag(libtp::data::flags::TOLD_YETA_ABOUT_PUMPKIN); // Told Yeta about Pumpkin
-        events::setSaveFileEventFlag(libtp::data::flags::PUMPKIN_PUT_IN_SOUP);     // Yeto put Pumpkin in soup
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
 
+        events::setSaveFileEventFlag(libtp::data::flags::TOLD_YETA_ABOUT_PUMPKIN);               // Told Yeta about Pumpkin
+        events::setSaveFileEventFlag(libtp::data::flags::PUMPKIN_PUT_IN_SOUP);                   // Yeto put Pumpkin in soup
         events::setSaveFileEventFlag(libtp::data::flags::TALKED_WITH_YETA_AFTER_GIVING_PUMPKIN); // SPR Lobby Door Unlocked
-
-        const auto stagesPtr = &libtp::data::stage::allStages[0];
-        libtp::tp::d_save::dSv_info_c* savePtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save;
-
-        if (libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Snowpeak_Ruins]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Darkhammer]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Blizzeta]))
-        {
-            savePtr->memory.temp_flags.memoryFlags[0x9] |= 0x4;
-        }
-        else
-        {
-            savePtr->save_file.mSave[0x14].temp_flags.memoryFlags[0x9] |= 0x4;
-        }
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Snowpeak_Ruins), 0x12); // Unlock north door
     }
 
     KEEP_FUNC void _02_ordonGoatCheeseItemFunc()
     {
-        events::setSaveFileEventFlag(libtp::data::flags::TOLD_YETA_ABOUT_CHEESE); // Told Yeta about Cheese
-        events::setSaveFileEventFlag(libtp::data::flags::CHEESE_PUT_IN_SOUP);     // Yeto put cheese in soup
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
 
+        events::setSaveFileEventFlag(libtp::data::flags::TOLD_YETA_ABOUT_CHEESE);               // Told Yeta about Cheese
+        events::setSaveFileEventFlag(libtp::data::flags::CHEESE_PUT_IN_SOUP);                   // Yeto put cheese in soup
         events::setSaveFileEventFlag(libtp::data::flags::TALKED_WITH_YETA_AFTER_GIVING_CHEESE); // SPR Lobby West Door Unlocked
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Snowpeak_Ruins), 0x13); // Unlock West Door
+    }
 
-        const auto stagesPtr = &libtp::data::stage::allStages[0];
-        libtp::tp::d_save::dSv_info_c* savePtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save;
-
-        if (libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Snowpeak_Ruins]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Darkhammer]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Blizzeta]))
-        {
-            savePtr->memory.temp_flags.memoryFlags[0x9] |= 0x8;
-        }
-        else
-        {
-            savePtr->save_file.mSave[0x14].temp_flags.memoryFlags[0x9] |= 0x8;
-        }
+    KEEP_FUNC void _02_partlyFilledSkybookItemFunc()
+    {
+        libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_item_record.unk5_ammo[0]++;
     }
 
     KEEP_FUNC void _02_filledSkybookItemFunc()
@@ -549,29 +521,14 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_gateKeysItemFunc()
     {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Eldin), 0x69); // Started Escort
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Eldin),
+                                               0x65);                           // Followed Rutella to Graveyard
         events::setSaveFileEventFlag(libtp::data::flags::WAGON_ESCORT_STARTED); // Started Zora Escort
         events::setSaveFileEventFlag(libtp::data::flags::ZORA_ESCORT_CLEARED);  // Completed Zora Escort
-
-        const auto stagesPtr = &libtp::data::stage::allStages[0];
-        if (libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Kakariko_Village]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Kakariko_Graveyard]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Death_Mountain]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Hidden_Village]) ||
-            libtp::tp::d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Kakariko_Village_Interiors]))
-        {
-            libtp::tp::d_save::dSv_memBit_c* tempFlagsPtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.memory.temp_flags;
-
-            libtp::tp::d_save::onSwitch_dSv_memBit(tempFlagsPtr, 0x69);
-            libtp::tp::d_save::onSwitch_dSv_memBit(tempFlagsPtr, 0x65);
-        }
-        else
-        {
-            libtp::tp::d_save::dSv_memBit_c* tempFlagsPtr =
-                &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.mSave[0x3].temp_flags;
-
-            libtp::tp::d_save::onSwitch_dSv_memBit(tempFlagsPtr, 0x69);
-            libtp::tp::d_save::onSwitch_dSv_memBit(tempFlagsPtr, 0x65);
-        }
     }
 
     KEEP_FUNC void _02_firstFusedShadowItemFunc()
@@ -594,23 +551,16 @@ namespace mod::game_patch
         libtp::tp::d_save::onCollectCrystal(&libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_collect,
                                             '\x02');
 
-        // Make sure the randomizer is loaded/enabled and a seed is loaded
-        rando::Seed* seedPtr;
-        if (seedPtr = getCurrentSeed(randomizer), !seedPtr)
-        {
-            return;
-        }
-
-        rando::Header* headerPtr = seedPtr->m_Header;
+        const rando::Header* headerPtr = rando::gRandomizer->getSeedPtr()->getHeaderPtr();
 
         // If the player has the castle requirement set to Fused Shadows.
-        if (headerPtr->castleRequirements == rando::CastleEntryRequirements::HC_Fused_Shadows)
+        if (headerPtr->getCastleRequirements() == rando::CastleEntryRequirements::HC_Fused_Shadows)
         {
             events::setSaveFileEventFlag(libtp::data::flags::BARRIER_GONE);
         }
 
         // If the player has the palace requirement set to Fused Shadows.
-        if (headerPtr->palaceRequirements == rando::PalaceEntryRequirements::PoT_Fused_Shadows)
+        if (headerPtr->getPalaceRequirements() == rando::PalaceEntryRequirements::PoT_Fused_Shadows)
         {
             events::setSaveFileEventFlag(libtp::data::flags::FIXED_THE_MIRROR_OF_TWILIGHT);
         }
@@ -642,22 +592,15 @@ namespace mod::game_patch
         libtp::tp::d_save::onCollectMirror(&libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_collect,
                                            '\x03');
 
-        // Make sure the randomizer is loaded/enabled and a seed is loaded
-        rando::Seed* seedPtr;
-        if (seedPtr = getCurrentSeed(randomizer), !seedPtr)
-        {
-            return;
-        }
-
-        rando::Header* headerPtr = seedPtr->m_Header;
+        const rando::Header* headerPtr = rando::gRandomizer->getSeedPtr()->getHeaderPtr();
 
         // If the player has the castle requirement set to Mirror Shards.
-        if (headerPtr->castleRequirements == rando::CastleEntryRequirements::HC_Mirror_Shards)
+        if (headerPtr->getCastleRequirements() == rando::CastleEntryRequirements::HC_Mirror_Shards)
         {
             events::setSaveFileEventFlag(libtp::data::flags::BARRIER_GONE);
         }
         // If the player has the palace requirement set to Mirror Shards.
-        if (headerPtr->palaceRequirements == rando::PalaceEntryRequirements::PoT_Mirror_Shards)
+        if (headerPtr->getPalaceRequirements() == rando::PalaceEntryRequirements::PoT_Mirror_Shards)
         {
             events::setSaveFileEventFlag(libtp::data::flags::FIXED_THE_MIRROR_OF_TWILIGHT);
         }
@@ -717,47 +660,131 @@ namespace mod::game_patch
     KEEP_FUNC void _02_foolishItemFunc()
     {
         // Failsafe: Make sure the count does not somehow exceed 100
-        uint8_t* triggerCount = &rando::foolishItems.triggerCount;
-        const uint32_t count = *triggerCount;
-        if (count < 100)
+        rando::customItems::FoolishItems* foolishItemsPtr = rando::gRandomizer->getFoolishItemsPtr();
+        const uint32_t triggerCount = foolishItemsPtr->getTriggerCount();
+        if (triggerCount < 100)
         {
-            *triggerCount = count + 1;
+            foolishItemsPtr->setTriggerCount(static_cast<uint8_t>(triggerCount + 1));
         }
     }
 
-    KEEP_FUNC int32_t _02_firstSkybookItemGetCheck()
+    KEEP_FUNC void _02_SFaronPortalItemFunc()
     {
-        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(rando::customItems::Ancient_Sky_Book_First_Character);
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
 
-        return static_cast<int32_t>(result);
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x47); // Unlock S Faron Portal
     }
 
-    KEEP_FUNC int32_t _02_secondSkybookItemGetCheck()
+    KEEP_FUNC void _02_NFaronPortalItemFunc()
     {
-        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(rando::customItems::Ancient_Sky_Book_Second_Character);
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
 
-        return static_cast<int32_t>(result);
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x2); // Unlock N Faron Portal
     }
 
-    KEEP_FUNC int32_t _02_thirdSkybookItemGetCheck()
+    KEEP_FUNC void _02_GorgePortalItemFunc()
     {
-        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(rando::customItems::Ancient_Sky_Book_Third_Character);
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
 
-        return static_cast<int32_t>(result);
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Hyrule_Field), 0x15); // Unlock Gorge Portal
     }
 
-    KEEP_FUNC int32_t _02_fourthSkybookItemGetCheck()
+    KEEP_FUNC void _02_KakVillagePortalItemFunc()
     {
-        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(rando::customItems::Ancient_Sky_Book_Fourth_Character);
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
 
-        return static_cast<int32_t>(result);
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Eldin), 0x1F); // Unlock Kak Portal
     }
 
-    KEEP_FUNC int32_t _02_fifthSkybookItemGetCheck()
+    KEEP_FUNC void _02_DeathMountainPortalItemFunc()
     {
-        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(rando::customItems::Ancient_Sky_Book_Fifth_Character);
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
 
-        return static_cast<int32_t>(result);
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Eldin), 0x15); // Unlock DM Portal
+    }
+
+    KEEP_FUNC void _02_CastleTownPortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Hyrule_Field), 0x3); // Unlock CT Portal
+    }
+
+    KEEP_FUNC void _02_ZorasDomainPortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Lanayru), 0x2); // Unlock ZD Portal
+    }
+
+    KEEP_FUNC void _02_LakeHyliaPortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Lanayru), 0xA); // Unlock LH Portal
+    }
+
+    KEEP_FUNC void _02_GerudoDesertPortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Gerudo_Desert), 0x15); // Unlock Desert Portal
+    }
+
+    KEEP_FUNC void _02_MirrorChamberPortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Gerudo_Desert), 0x28); // Unlock MC Portal
+    }
+
+    KEEP_FUNC void _02_SnowpeakPortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Snowpeak), 0x15); // Unlock Snowpeak Portal
+    }
+
+    KEEP_FUNC void _02_SacredGrovePortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Sacred_Grove), 0x64); // Unlock Grove Portal
+    }
+
+    KEEP_FUNC void _02_EldinBridgePortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Hyrule_Field),
+                                               0x63); // Unlock Eldin Bridge Portal
+    }
+
+    KEEP_FUNC void _02_UpperZoraRiverPortalItemFunc()
+    {
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Lanayru),
+                                               0x17); // Talked to Iza before Portal
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Lanayru), 0x37); // Talked to Iza after Portal
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Lanayru), 0x15); // Unlock UZR Portal
+        events::setSaveFileEventFlag(libtp::data::flags::DECLINED_TO_HELP_IZA);
+        events::setSaveFileEventFlag(libtp::data::flags::TALKED_TO_IZA_BEFORE_UZR_PORTAL);
+        events::setSaveFileEventFlag(libtp::data::flags::IZA_1_MINIGAME_UNLOCKED);
     }
 
     KEEP_FUNC int32_t _02_bigWalletItemGetCheck()
@@ -865,6 +892,36 @@ namespace mod::game_patch
     KEEP_FUNC int32_t _02_gateKeysItemGetCheck()
     {
         bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(libtp::data::items::Gate_Keys);
+        return static_cast<int32_t>(result);
+    }
+
+    KEEP_FUNC int32_t _02_letterItemGetCheck()
+    {
+        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(libtp::data::items::Renardos_Letter);
+        return static_cast<int32_t>(result);
+    }
+
+    KEEP_FUNC int32_t _02_invoiceItemGetCheck()
+    {
+        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(libtp::data::items::Invoice);
+        return static_cast<int32_t>(result);
+    }
+
+    KEEP_FUNC int32_t _02_statueItemGetCheck()
+    {
+        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(libtp::data::items::Wooden_Statue);
+        return static_cast<int32_t>(result);
+    }
+
+    KEEP_FUNC int32_t _02_charmItemGetCheck()
+    {
+        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(libtp::data::items::Ilias_Charm);
+        return static_cast<int32_t>(result);
+    }
+
+    KEEP_FUNC int32_t _02_horseCallItemGetCheck()
+    {
+        bool result = libtp::tp::d_com_inf_game::dComIfGs_isItemFirstBit(libtp::data::items::Horse_Call);
         return static_cast<int32_t>(result);
     }
 } // namespace mod::game_patch

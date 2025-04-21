@@ -12,8 +12,9 @@
 #include "tp/JKRArchivePub.h"
 #include "gc_wii/OSCache.h"
 #include "rando/customItems.h"
+#include "events.h"
 
-#ifdef TP_EU
+#if defined TP_EU || defined TP_WUS2
 #include "tp/d_s_logo.h"
 #endif
 
@@ -24,8 +25,6 @@
 
 namespace mod::game_patch
 {
-    KEEP_VAR uint8_t dungeonItemAreaColorIndex = 0;
-
     /*
     int32_t getItemIdFromMsgId( const void* TProcessor, uint16_t unk3, uint32_t msgId )
     {
@@ -155,14 +154,14 @@ namespace mod::game_patch
 
     const char* getSkyBookMessage(uint32_t msgId)
     {
-        using namespace rando::customItems;
+        using namespace libtp::data::items;
 
         // Check if this is for the individual characters or the Item Wheel description
         bool isForCharacter = false;
         if (msgId != 0x34D) // Item Wheel description
         {
             // Not for the Item Wheel description, so assume this is for the individual characters
-            msgId = ITEM_TO_ID(Ancient_Sky_Book_First_Character);
+            msgId = ITEM_TO_ID(Ancient_Sky_Book_Partly_Filled);
             isForCharacter = true;
         }
 
@@ -175,21 +174,13 @@ namespace mod::game_patch
         }
 
         // Figure out how many characters the player currently has
-        uint32_t skyCharacterCount = 0;
+        uint32_t skyCharacterCount =
+            libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_item_record.unk5_ammo[0];
 
         // If this is for the individual characters, then the flag for the current character won't update until the textbox has
         // closed, so add one
         if (isForCharacter)
         {
-            skyCharacterCount++;
-        }
-
-        for (uint32_t i = 0; i < 5; i++)
-        {
-            if (!events::haveItem(Ancient_Sky_Book_First_Character + i))
-            {
-                break;
-            }
             skyCharacterCount++;
         }
 
@@ -213,11 +204,14 @@ namespace mod::game_patch
         return createString(format, msgSize, poeCount);
     };
 
-#ifdef TP_EU
-    bool __attribute__((noinline)) shouldGetTheText()
+    // The following function is set up to be used in the function getDungeonItemMessage
+    // 'the' text is only used for some languages
+    static bool getTheText(rando::Randomizer* randoPtr)
     {
+#if defined TP_EU || defined TP_WUS2
         using namespace libtp::tp::d_s_logo;
-        switch (currentLanguage)
+
+        switch (randoPtr->getCurrentLanguage())
         {
             case Languages::uk:
             default: // The language is invalid/unsupported, so the game defaults to English
@@ -232,6 +226,43 @@ namespace mod::game_patch
                 return false;
             }
         }
+#elif defined TP_US
+        (void)randoPtr;
+        return true;
+#elif defined TP_JP
+        // Shouldn't be necessary, but do anyway
+        (void)randoPtr;
+        return false;
+#endif
+    }
+
+#ifndef TP_JP
+    // The following function is set up to be used in the function getDungeonItemMessage
+    // 'for' text is only used for some languages
+    static bool getForText(rando::Randomizer* randoPtr)
+    {
+#if defined TP_EU || defined TP_WUS2
+        using namespace libtp::tp::d_s_logo;
+
+        switch (randoPtr->getCurrentLanguage())
+        {
+            case Languages::uk:
+            case Languages::de:
+            case Languages::it:
+            default: // The language is invalid/unsupported, so the game defaults to English
+            {
+                return true;
+            }
+            case Languages::fr:
+            case Languages::sp:
+            {
+                return false;
+            }
+        }
+#else
+        (void)randoPtr;
+        return true;
+#endif
     }
 #endif
 
@@ -239,10 +270,11 @@ namespace mod::game_patch
     {
         using namespace libtp::data::items;
         using namespace rando::customItems;
-#ifdef TP_EU
+#if defined TP_EU || defined TP_WUS2
         using namespace libtp::tp::d_s_logo;
 #endif
         // Get the text and size of the format text
+        rando::Randomizer* randoPtr = rando::gRandomizer;
         uint32_t itemIdForBase;
 #ifdef TP_JP
         switch (itemId)
@@ -283,46 +315,6 @@ namespace mod::game_patch
 #endif
         };
 
-        // 'for' text is only used for some languages
-        auto getForText = []()
-        {
-#ifdef TP_EU
-            switch (currentLanguage)
-            {
-                case Languages::uk:
-                case Languages::de:
-                case Languages::it:
-                default: // The language is invalid/unsupported, so the game defaults to English
-                {
-                    return true;
-                }
-                case Languages::fr:
-                case Languages::sp:
-                {
-                    return false;
-                }
-            }
-#elif defined TP_US
-            return true;
-#elif defined TP_JP
-            // Shouldn't be necessary, but do anyway
-            return false;
-#endif
-        };
-
-        // 'the' text is only used for some languages
-        auto getTheText = []()
-        {
-#ifdef TP_EU
-            return shouldGetTheText();
-#elif defined TP_US
-            return true;
-#elif defined TP_JP
-            // Shouldn't be necessary, but do anyway
-            return false;
-#endif
-        };
-
         // JP Snowpeak Ruins doesn't need anything from the next section as the colors are already defined in
         // the customMessage object in japaneseMessages.cpp
         const char* areaText = nullptr;
@@ -346,7 +338,7 @@ namespace mod::game_patch
                 {
                     areaColorId = MSG_COLOR_GREEN_HEX;
                     dungeonAreaMsgId = SpecialMessageIds::FOREST_TEMPLE;
-                    addTheText = getTheText();
+                    addTheText = getTheText(randoPtr);
                     break;
                 }
                 case Goron_Mines_Small_Key:
@@ -364,7 +356,7 @@ namespace mod::game_patch
                 {
                     areaColorId = CUSTOM_MSG_COLOR_BLUE_HEX;
                     dungeonAreaMsgId = SpecialMessageIds::LAKEBED_TEMPLE;
-                    addTheText = getTheText();
+                    addTheText = getTheText(randoPtr);
                     break;
                 }
                 case Arbiters_Grounds_Small_Key:
@@ -391,7 +383,7 @@ namespace mod::game_patch
                 {
                     areaColorId = CUSTOM_MSG_COLOR_DARK_GREEN_HEX;
                     dungeonAreaMsgId = SpecialMessageIds::TEMPLE_OF_TIME;
-                    addTheText = getTheText();
+                    addTheText = getTheText(randoPtr);
                     break;
                 }
                 case City_in_The_Sky_Small_Key:
@@ -401,7 +393,7 @@ namespace mod::game_patch
                 {
                     areaColorId = MSG_COLOR_YELLOW_HEX;
                     dungeonAreaMsgId = SpecialMessageIds::CITY_IN_THE_SKY;
-                    addTheText = getTheText();
+                    addTheText = getTheText(randoPtr);
                     break;
                 }
                 case Palace_of_Twilight_Small_Key:
@@ -411,7 +403,7 @@ namespace mod::game_patch
                 {
                     areaColorId = MSG_COLOR_PURPLE_HEX;
                     dungeonAreaMsgId = SpecialMessageIds::PALACE_OF_TWILIGHT;
-                    addTheText = getTheText();
+                    addTheText = getTheText(randoPtr);
                     break;
                 }
                 case Hyrule_Castle_Small_Key:
@@ -427,7 +419,7 @@ namespace mod::game_patch
                 {
                     areaColorId = MSG_COLOR_ORANGE_HEX;
                     dungeonAreaMsgId = SpecialMessageIds::BULBLIN_CAMP;
-                    addTheText = getTheText();
+                    addTheText = getTheText(randoPtr);
                     break;
                 }
                 default:
@@ -446,7 +438,7 @@ namespace mod::game_patch
 
             // Replace the dungeon area color
             // Make sure the index was properly adjusted
-            uint32_t colorIndex = dungeonItemAreaColorIndex;
+            const uint32_t colorIndex = randoPtr->getDungeonItemAreaColorIndex();
             if (colorIndex != 0)
             {
                 char* colorAddress = const_cast<char*>(&format[colorIndex]);
@@ -528,7 +520,7 @@ namespace mod::game_patch
 #ifndef TP_JP
         // Get the 'for' text
         const char* forText;
-        if (getForText())
+        if (getForText(randoPtr))
         {
             forText = _05_getMsgById(SpecialMessageIds::FOR);
             if (!forText)
@@ -558,8 +550,7 @@ namespace mod::game_patch
 
         return createString(format, msgSize, dungeonItemText, forText, theText, areaText);
 #else
-        // Prevent the compiler from complaining about getForText and addTheText being unused
-        (void)getForText();
+        // Prevent the compiler from complaining about addTheText being unused
         (void)addTheText;
 
         // JP doesn't use `for` nor `the` and the params are in a different order
@@ -625,11 +616,7 @@ namespace mod::game_patch
             {
                 return getPoeSoulMessage();
             }
-            case ITEM_TO_ID(Ancient_Sky_Book_First_Character):
-            case ITEM_TO_ID(Ancient_Sky_Book_Second_Character):
-            case ITEM_TO_ID(Ancient_Sky_Book_Third_Character):
-            case ITEM_TO_ID(Ancient_Sky_Book_Fourth_Character):
-            case ITEM_TO_ID(Ancient_Sky_Book_Fifth_Character):
+            case ITEM_TO_ID(Ancient_Sky_Book_Partly_Filled):
             case 0x34D: // Sky Book Item Wheel description
             {
                 return getSkyBookMessage(msgId);
@@ -671,24 +658,6 @@ namespace mod::game_patch
         // Most text replacements are for zel_00.bmg, so check that first
         if (currentInf1 == getZel00BmgInf())
         {
-            // If msgId is for a foolish item, then only use the value from the first one to avoid duplicate entries
-            switch (ID_TO_ITEM(msgId))
-            {
-                case Foolish_Item_2:
-                case Foolish_Item_3:
-                case Foolish_Item_4:
-                case Foolish_Item_5:
-                case Foolish_Item_6:
-                {
-                    msgId = ITEM_TO_ID(Foolish_Item_1);
-                    break;
-                }
-                default:
-                {
-                    break;
-                }
-            }
-
             const char* newMessage;
             if (msgId == 0x1369) // The custom message ID used for hints on custom signs
             {
@@ -746,6 +715,9 @@ namespace mod::game_patch
     {
         using namespace libtp::data::items;
 
+        rando::Randomizer* randoPtr = rando::gRandomizer;
+        rando::Seed* seedPtr = randoPtr->getSeedPtr();
+
         // If there are any special message IDs that require additional logic, we handle them here.
         switch (msgId)
         {
@@ -755,11 +727,16 @@ namespace mod::game_patch
             case 0x299:                    // Big Wallet Pause Menu Text
             case 0x29A:                    // Giant Wallet Pause Menu Text
             {
-                if (!walletsPatched)
+                if (!seedPtr->walletsAreIncreased())
                 {
                     return nullptr;
                 }
                 break;
+            }
+            case 0x42:
+            {
+                // This is the `Choose a Quest Log` text on the file select screen
+                return seedPtr->getHeaderPtr()->getSeedNamePtr();
             }
             case 0xFFFF:
             {
@@ -774,7 +751,7 @@ namespace mod::game_patch
         }
 
         // Make sure the custom text is loaded
-        const uint32_t msgTableInfoRaw = reinterpret_cast<uint32_t>(m_MsgTableInfo);
+        const uint32_t msgTableInfoRaw = reinterpret_cast<uint32_t>(randoPtr->getMsgTableInfoPtr());
         if (!msgTableInfoRaw)
         {
             return nullptr;
@@ -784,7 +761,7 @@ namespace mod::game_patch
         const uint16_t* msgIds = reinterpret_cast<uint16_t*>(msgTableInfoRaw);
 
         // Get the total size of the message ids
-        const uint32_t totalMessages = m_TotalMsgEntries;
+        const uint32_t totalMessages = randoPtr->getTotalMsgEntries();
         uint32_t msgIdTableSize = totalMessages * sizeof(uint16_t);
 
         // Round msgIdTableSize up to the size of the offset type to make sure the offsets are properly aligned
@@ -824,7 +801,8 @@ namespace mod::game_patch
         using namespace rando;
 
         // Make sure the hints text is loaded
-        const uint32_t hintMsgTableInfoRaw = reinterpret_cast<uint32_t>(m_HintMsgTableInfo);
+        rando::Randomizer* randoPtr = gRandomizer;
+        const uint32_t hintMsgTableInfoRaw = reinterpret_cast<uint32_t>(randoPtr->getHintMsgTableInfoPtr());
         if (!hintMsgTableInfoRaw)
         {
             return nullptr;
@@ -840,7 +818,7 @@ namespace mod::game_patch
         const int32_t stageIDX = libtp::tools::getStageIndex(currentStage);
 
         // Get the total size of the message ids
-        const uint32_t hintTotalMessages = m_TotalHintMsgEntries;
+        const uint32_t hintTotalMessages = randoPtr->getTotalHintMsgEntries();
         uint32_t msgIdTableSize = hintTotalMessages * sizeof(CustomMessageData);
 
         // Round msgIdTableSize up to the size of the offset type to make sure the offsets are properly aligned
@@ -863,10 +841,12 @@ namespace mod::game_patch
         {
             const CustomMessageData* currentMsgData = &msgData[i];
 
-            if (currentMsgData->msgID == msgId)
+            if (currentMsgData->getMsgID() == msgId)
             {
-                if (((stageIDX == currentMsgData->stageIDX) && (currentRoom == currentMsgData->roomIDX)) ||
-                    (currentMsgData->stageIDX == 0xFF))
+                const int32_t currentStageIdx = static_cast<int32_t>(currentMsgData->getStageIDX());
+
+                if (((stageIDX == currentStageIdx) && (currentRoom == currentMsgData->getRoomIDX())) ||
+                    (currentStageIdx == 0xFF))
                 {
                     return &hintMessages[hintMsgOffsets[i]];
                 }

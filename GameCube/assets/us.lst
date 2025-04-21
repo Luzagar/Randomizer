@@ -65,8 +65,10 @@
 800349bc:isEventBit
 800352b0:offSwitch_dSv_info
 80034810:onSwitch_dSv_memBit
+80035200:onSwitch_dSv_info
 80034838:offSwitch_dSv_memBit
 80034860:isSwitch_dSv_memBit
+80034dac:onOneSwitch
 800332f8:setLineUpItem
 80034368:onLightDropGetFlag
 800337ec:checkEmptyBottle
@@ -158,6 +160,10 @@
 8012d8c0:procWolfDashReverseInit
 8013c8c8:procWolfAttackReverseInit
 8012dba8:procWolfAtnActorMoveInit
+800b5284:decideDoStatus
+800b9f50:checkGroundSpecialMode
+800c0310:checkDungeon
+800c02c8:checkBossRoom
 
 // data
 8038EB8C:climbVars
@@ -171,6 +177,7 @@
 801b074c:dMenuCollect_screenSet
 
 // JKRHeap.o
+802CE624:resize1_JKRHeap
 802CEC98:__nw_JKRHeap
 802CED3C:__dl_JKRHeap
 
@@ -296,6 +303,7 @@
 8002dca8:dComIfGs_getMaxLifeGauge
 8002d2fc:dComIfGp_setNextStage
 8002d7d0:dComIfGs_onStageBossEnemy
+8002d628:dComIfGs_onStageSwitch
 
 // d_kankyo.o
 // data
@@ -344,6 +352,9 @@
 80348f80:DVDOpenDir
 80349040:DVDReadDir
 803490e4:DVDCloseDir
+
+//d_meter2.o
+8021f7b0:checkStatus
 
 //d_meter2_info.o
 80430188:g_meter2_info
@@ -406,6 +417,7 @@
 
 //d_camera.o
 80182ad8:checkRide
+801617b0:updatePad
 
 //d_resource.o
 8003c1e4:getResInfo
@@ -426,6 +438,7 @@
 801eab7c:dMenuRing__create
 801eabe8:dMenuRing__delete
 801eacc8:dMenuRing__draw
+801e9118:dMenuRing_ct
 
 // JKRArchive.o
 802D5C64:JKRArchive_getResource2
@@ -489,3 +502,15 @@
 
 // d_file_select.o
 801843cc:dFile_select_c___create
+
+// d_menu_option.o
+801e51cc:dMenuOption__tv_open1_move
+
+// d_a_obj_item.o
+8015d0a8:itemGet
+8015ceec:itemGetNextExecute
+8015ccd0:mode_wait
+8015b3d8:CreateInit
+
+// d_s_play.o
+80259d84:dScnPlay_phase_1

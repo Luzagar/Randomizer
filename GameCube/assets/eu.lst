@@ -65,8 +65,10 @@
 80034318:onCollectMirror
 800342d4:onCollectCrystal
 80034940:onSwitch_dSv_memBit
+80035330:onSwitch_dSv_info
 800353e0:offSwitch_dSv_info
 80034968:offSwitch_dSv_memBit
+80034edc:onOneSwitch
 80033060:setItem
 80034410:onLightDropGetFlag
 80033894:checkEmptyBottle
@@ -150,6 +152,10 @@
 8012dacc:procWolfDashReverseInit
 8013cad4:procWolfAttackReverseInit
 8012ddb4:procWolfAtnActorMoveInit
+800b5490:decideDoStatus
+800ba15c:checkGroundSpecialMode
+800c051c:checkDungeon
+800c04d4:checkBossRoom
 
 // data
 8039038C:climbVars
@@ -157,6 +163,9 @@
 8038ff7c:lanternVars
 8038fff4:ironBootsVars
 8038ff60:huLightVars
+
+//d_meter2.o
+8021fa74:checkStatus
 
 //d_meter2_info.o
 80432148:g_meter2_info
@@ -173,6 +182,7 @@
 801b09a4:dMenuCollect_screenSet
 
 // JKRHeap.o
+802CF424:resize1_JKRHeap
 802CFA98:__nw_JKRHeap
 802CFB3C:__dl_JKRHeap
 
@@ -297,6 +307,7 @@
 8002dd50:dComIfGs_getMaxLifeGauge
 8002d3a4:dComIfGp_setNextStage
 8002d878:dComIfGs_onStageBossEnemy
+8002d6d0:dComIfGs_onStageSwitch
 
 // d_kankyo.o
 // data
@@ -399,6 +410,7 @@
 
 //d_camera.o
 80182ce4:checkRide
+801619bc:updatePad
 
 //d_a_player.o
 80452fd8:m_midnaActor
@@ -425,6 +437,7 @@
 801eae40:dMenuRing__create
 801eaeac:dMenuRing__delete
 801eaf8c:dMenuRing__draw
+801e93dc:dMenuRing_ct
 
 // JKRArchive.o
 802d6a64:JKRArchive_getResource2
@@ -478,3 +491,15 @@
 
 // d_file_select.o
 801845d8:dFile_select_c___create
+
+// d_menu_option.o
+801e5490:dMenuOption__tv_open1_move
+
+// d_a_obj_item.o
+8015d2b4:itemGet
+8015d0f8:itemGetNextExecute
+8015cedc:mode_wait
+8015b5e4:CreateInit
+
+// d_s_play.o
+8025ab84:dScnPlay_phase_1

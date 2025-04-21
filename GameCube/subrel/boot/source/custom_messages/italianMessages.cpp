@@ -1,5 +1,5 @@
-// This file should only be used for EU
-#ifdef TP_EU
+// This file should only be used for GC EU and Wii US 1.2
+#if defined TP_EU || defined TP_WUS2
 
 #include "customMessages.h"
 #include "tp/resource.h"
@@ -952,20 +952,10 @@ namespace mod::customMessages
         // finora.
         "\x20\x66\x69\x6E\x6F\x72\x61\x2E"
     MSG_END();
-    MSG_BEGIN_ARRAY(charloDonationIt)
-    // Avresti qualche spicciolo da dare per la pace di Hyrule?
-        "\x41\x76\x72\x65\x73\x74\x69\x20\x71\x75\x61\x6C\x63\x68\x65\x20\x73\x70\x69\x63\x63\x69\x6F\x6C\x6F\x20\x64\x61\x0A\x64\x61\x72\x65\x20\x70\x65\x72\x20\x6C\x61\x20\x70\x61\x63\x65\x20\x64\x69\x20\x48\x79\x72\x75\x6C\x65\x3F\x31"
-        MSG_OPTION_LIST(MSG_OPTION_1) 
-        // 100 Rupie
-        "\x31\x30\x30\x20\x52\x75\x70\x69\x65\x0A" 
-        MSG_OPTION_LIST(MSG_OPTION_2) 
-        // 50 Rupie
-        "\x35\x30\x20\x52\x75\x70\x69\x65\x0A" 
-        MSG_OPTION_LIST(MSG_OPTION_3) 
-        // No
-        "\x4E\x6F";
+    MSG_BEGIN_ARRAY(spawnTextIt)
+        "Return to Spawn"
+        MSG_ICON(MSG_ICON_Z)
     MSG_END();
-
     MSG_BEGIN_ARRAY(recognitionIt)
         MSG_SPEED(MSG_SPEED_FAST)
         // La Squadra Randomizer vuole ringraziare ai nostri fantastici tester. Senza di voi, questo progetto non sarebbe quello lo che è oggi
@@ -1043,7 +1033,7 @@ namespace mod::customMessages
         // First Ancient Sky Book character
         skyBookCharacterIt,
         sizeof(skyBookCharacterIt),
-        0x013F,
+        0x014E,
 
         // First Fused Shadow
         firstFusedShadowIt,
@@ -1124,6 +1114,11 @@ namespace mod::customMessages
         skyBookDescriptionIt,
         sizeof(skyBookDescriptionIt),
         0x34d,
+
+        // Spawn text
+        spawnTextIt,
+        sizeof(spawnTextIt),
+        0x555,
 
         // Recognition text
         recognitionIt,
@@ -1214,7 +1209,6 @@ namespace mod::customMessages
     };
 
     const uint32_t totalCustomMessagesIt = sizeof(entriesIt) / sizeof(MsgEntry);
-    const MsgEntry charloDonationEntryIt = {charloDonationIt, sizeof(charloDonationIt), 0x0355};
 
     const ItemWheelMenuStrings itemWheelMenuStringsIt = {
         // areasBeingTracked
@@ -1267,10 +1261,6 @@ namespace mod::customMessages
         // seedIsLoaded
         // Seed
         "\x53\x65\x65\x64",
-
-        // seedIsNotLoaded
-        // Nessun seed é stato caricato
-        "\x4E\x65\x73\x73\x75\x6E\x20\x73\x65\x65\x64\x20\xE9\x20\x73\x74\x61\x74\x6F\x20\x63\x61\x72\x69\x63\x61\x74\x6F",
 
         // yes/no
         // Sì
