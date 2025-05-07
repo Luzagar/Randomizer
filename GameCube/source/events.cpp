@@ -419,7 +419,7 @@ namespace mod::events
                             }
                             case items::Aurus_Memo:
                             {
-                                *reinterpret_cast<float*>(reinterpret_cast<uint16_t>(daObjLifePtr) + 0x4E4) = 48.f;
+                                *reinterpret_cast<float*>(reinterpret_cast<uint32_t>(daObjLifePtr) + 0x4E4) = 30.f;
                                 break;
                             }
                             default:
