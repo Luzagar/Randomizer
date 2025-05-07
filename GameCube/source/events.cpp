@@ -417,11 +417,11 @@ namespace mod::events
                                 *reinterpret_cast<float*>(reinterpret_cast<uint32_t>(daObjLifePtr) + 0x4D4) = height + 25.f;
                                 break;
                             }
-                            case items::Aurus_Memo:
-                            {
-                                *reinterpret_cast<float*>(reinterpret_cast<uint32_t>(daObjLifePtr) + 0x4E4) = 30.f;
-                                break;
-                            }
+                            // case items::Aurus_Memo:
+                            // {
+                            //     *reinterpret_cast<float*>(reinterpret_cast<uint32_t>(daObjLifePtr) + 0x4E4) = 30.f;
+                            //     break;
+                            // }
                             default:
                             {
                                 break;
