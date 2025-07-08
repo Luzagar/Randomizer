@@ -46,6 +46,7 @@ namespace mod::events
     extern const libtp::tp::dzx::ACTR SignActr;
     extern const libtp::tp::dzx::ACTR gMstrSrdActr;
     extern const libtp::tp::dzx::ACTR gCoroActr;
+    extern const libtp::tp::dzx::ACTR gShadowBeastActr;
 
     /**
      * @brief Runs when loading just started
@@ -142,6 +143,8 @@ namespace mod::events
     void onAdjustFieldItemParams(libtp::tp::f_op_actor::fopAc_ac_c* fopAC, void* daObjLife);
 
     void onAdjustCreateItemParams(void* daDitem);
+
+    void onAdjustCreateRupeeItemParams(void* daDitem);
 
     int32_t proc_query022(void* unk1, void* unk2, int32_t unk3);
 

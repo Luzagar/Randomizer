@@ -34,6 +34,7 @@
 #include "tp/d_file_select.h"
 #include "tp/d_menu_option.h"
 #include "functionHooks.h"
+#include "tp/d_a_obj_item.h"
 
 #include <cstdint>
 #include <cstring>
@@ -159,6 +160,8 @@ namespace mod
 
         gReturn_CheckFieldItemCreateHeap =
             patch::hookFunction(libtp::tp::d_a_itembase::CheckFieldItemCreateHeap, handle_CheckFieldItemCreateHeap);
+
+        gReturn_CreateInit = patch::hookFunction(libtp::tp::d_a_obj_item::CreateInit, handle_CreateInit);
 
         // Item Wheel functions
         gReturn_setLineUpItem = patch::hookFunction(tp::d_save::setLineUpItem, handle_setLineUpItem);
@@ -315,7 +318,11 @@ namespace mod
         // Link's Animated Equipment
         randoPtr->setDvdEntryNum(DVDConvertPathToEntrynum("/res/Object/AlAnm.arc"), DvdEntryNumId::ResObjectAlAnm);
 
-        // randoPtr->setDvdEntryNum(DVDConvertPathToEntrynum("/res/Object/Wmdl.arc"), DvdEntryNumId::ResObjectWmdl);
+        // Epona
+        randoPtr->setDvdEntryNum(DVDConvertPathToEntrynum("/res/Object/Horse.arc"), DvdEntryNumId::ResObjectHorse);
+
+        // Wolf Link and Midna on Back
+        randoPtr->setDvdEntryNum(DVDConvertPathToEntrynum("/res/Object/Wmdl.arc"), DvdEntryNumId::ResObjectWmdl);
         // randoPtr->setDvdEntryNum(DVDConvertPathToEntrynum("/res/Object/CWShd.arc"), DvdEntryNumId::ResObjectCWShd);
         // randoPtr->setDvdEntryNum(DVDConvertPathToEntrynum("/res/Object/SWShd.arc"), DvdEntryNumId::ResObjectSWShd);
         // randoPtr->setDvdEntryNum(DVDConvertPathToEntrynum("/res/Object/HyShd.arc"), DvdEntryNumId::ResObjectHyShd);
