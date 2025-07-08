@@ -668,8 +668,10 @@ namespace mod
 
         // getConsole() << stageIDX << "," << roomNo << "," << point << "," << layer << "\n";
 
-        if (stageIDX != libtp::data::stage::StageIDs::Title_Screen) // We won't want to shuffle if we are loading a save since
-                                                                    // some stages use their default spawn for their entrances.
+        if (!libtp::tp::d_a_alink::checkStageName(
+                libtp::data::stage::allStages
+                    [libtp::data::stage::StageIDs::Title_Screen])) // We won't want to shuffle if we are loading a save since
+                                                                   // some stages use their default spawn for their entrances.
         {
             for (uint32_t i = 0; i < numShuffledEntrances; i++)
             {
@@ -902,6 +904,14 @@ namespace mod
         }
     }
 
+    KEEP_FUNC void handle_CreateInit(void* daItem)
+    {
+        // Modify the scale params of the rupee actor before it is created.
+        gReturn_CreateInit(daItem);
+        events::onAdjustCreateRupeeItemParams(daItem);
+        return;
+    }
+
     KEEP_FUNC void handle_setLineUpItem(libtp::tp::d_save::dSv_player_item_c* unk1)
     {
         (void)unk1;
@@ -998,12 +1008,8 @@ namespace mod
                 // Check to see if currently in Snowpeak Ruins
                 if (libtp::tp::d_a_alink::checkStageName(stagesPtr[StageIDs::Darkhammer]))
                 {
-                    if (libtp::tp::d_save::isSwitch_dSv_memBit(&d_com_inf_game::dComIfG_gameInfo.save.memory.temp_flags,
-                                                               0x5F)) // Picked up the Ball and Chain check.
-                    {
-                        // Return true so that they check cannot be infinitely picked up.
-                        return 1;
-                    }
+                    return libtp::tp::d_save::isSwitch_dSv_memBit(&d_com_inf_game::dComIfG_gameInfo.save.memory.temp_flags,
+                                                                  0x5F); // Picked up the Ball and Chain check.
                 }
                 break;
             }

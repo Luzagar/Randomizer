@@ -156,6 +156,13 @@ namespace mod::rando
         MessageResource = 0x5, // Replaces values in the MESG section of a bmgres archive file.
     };
 
+    enum class MirrorChamberRequirement : uint8_t
+    {
+        Open = 0x0,
+        Barrier = 0x1,
+        Closed = 0x2,
+    };
+
     class ARCReplacement
     {
        public:
@@ -460,10 +467,11 @@ namespace mod::rando
         ResObjectAlink,  // Link's Equipment
         ResObjectMmdl,   // Magic Armor
         ResObjectAlAnm,  // Link's Animated Equipment
-                         // ResObjectWmdl,      // Wolf Link and Midna on back
-                         // ResObjectCWShd,     // Ordon Shield
-                         // ResObjectSWShd,     // Wooden Shield
-                         // ResObjectHyShd,     // Hylian Shield
+        ResObjectHorse,
+        ResObjectWmdl, // Wolf Link and Midna on back
+                       // ResObjectCWShd,     // Ordon Shield
+                       // ResObjectSWShd,     // Wooden Shield
+                       // ResObjectHyShd,     // Hylian Shield
 
         DvdEntryNumIdSize,
         // DvdEntryNumIdSize MUST GO LAST. When adding a new enum, put it above this one and don't forget to actually add the
