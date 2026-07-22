@@ -686,6 +686,10 @@ namespace mod
                 stage::allStages[stage::StageIDs::Title_Screen])) // We won't want to shuffle if we are loading a save since
                                                                   // some stages use their default spawn for their entrances.
         {
+            if (seedPtr->isExteriorEREnabled() && ((stageIDX != stage::Zoras_River) && (stageIDX != stage::Upper_Zoras_River)))
+            {
+                lastMode = 0;
+            }
             for (uint32_t i = 0; i < numShuffledEntrances; i++)
             {
                 const rando::ShuffledEntrance* currentEntrance = &shuffledEntrances[i];
@@ -807,11 +811,21 @@ namespace mod
 
                 case 0xD0:
                 {
-                    if (libtp::tp::d_a_alink::checkStageName(
-                            libtp::data::stage::allStages[libtp::data::stage::StageIDs::Lake_Hylia]) &&
-                        !libtp::tp::d_com_inf_game::dComIfGs_isEventBit(libtp::data::flags::CLEARED_LANAYRU_TWILIGHT))
+                    if (!libtp::tp::d_com_inf_game::dComIfGs_isEventBit(libtp::data::flags::CLEARED_LANAYRU_TWILIGHT))
                     {
-                        *entranceType = 0x50;
+                        switch (rando::gRandomizer->getSeedPtr()->getStageIDX())
+                        {
+                            case libtp::data::stage::StageIDs::Lake_Hylia:
+                            case libtp::data::stage::StageIDs::Hyrule_Field:
+                            {
+                                *entranceType = 0x50;
+                                break;
+                            }
+                            default:
+                            {
+                                break;
+                            }
+                        }
                     }
                     break;
                 }
@@ -1239,6 +1253,16 @@ namespace mod
             return 1;
         }
         return gReturn_checkEmptyBottle(playerItem);
+    }
+
+    KEEP_FUNC uint32_t handle_checkKandelaarSwing(libtp::tp::d_a_alink::daAlink* linkPtr, int32_t value)
+    {
+        if (libtp::tools::playerIsInRoomStage(5, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Faron_Woods]))
+        {
+            // Return 1 to allow the player to run through the mist without needing to manually swing the lantern
+            return 1;
+        }
+        return gReturn_checkKandelaarSwing(linkPtr, value);
     }
 
     KEEP_FUNC int32_t handle_query049(void* unk1, void* unk2, int32_t unk3)
@@ -1675,6 +1699,13 @@ namespace mod
             libtp::tp::d_save::dSv_player_status_b_c* playerStatusBPtr = &playerPtr->player_status_b;
 
             const uint32_t darkClearLevelFlag = playerStatusBPtr->dark_clear_level_flag;
+
+            // Before setting any flags, we want to check and see if we need to give an item for the flag to be set
+            if (!libtp::tp::d_com_inf_game::dComIfGs_isEventBit(flag))
+            {
+                const uint32_t flagItem = rando::gRandomizer->getFlagItem(flag, 0xFF);
+                rando::gRandomizer->addItemToEventQueue(flagItem);
+            }
 
             switch (flag)
             {
