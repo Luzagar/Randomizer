@@ -341,6 +341,11 @@ namespace mod::events
                                 *reinterpret_cast<float*>(reinterpret_cast<uint32_t>(daObjLifePtr) + 0x4D4) = height + 25.f;
                                 break;
                             }
+                            case items::Aurus_Memo:
+                            {
+                                *reinterpret_cast<float*>(reinterpret_cast<uint32_t>(daObjLifePtr) + 0x4E4) = 48.f;
+                                break;
+                            }
                             default:
                             {
                                 break;
@@ -1251,6 +1256,11 @@ namespace mod::events
                         tp::d_save::isEventBit(eventPtr, data::flags::ORDON_DAY_2_OVER))
                     {
                         tools::spawnActor(4, gCoroActr);
+                    }
+                    if(rando::gRandomizer->getSeedPtr()->isCoroKeyEnabled() && !haveItem(libtp::data::items::Coro_Key))
+                    {
+                        //tools::spawnActor(4, gFaronGateActr);
+                        //tools::spawnActor(4, gFaronGateActr);
                     }
                 }
                 break;
