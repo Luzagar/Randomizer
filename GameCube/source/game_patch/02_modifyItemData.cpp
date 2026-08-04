@@ -439,9 +439,35 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_faronCoroKeyItemFunc()
     {
+        const libtp::data::stage::AreaNodesID nodeId = libtp::data::stage::AreaNodesID::Faron;
+        uint8_t roomNo = 0;
+        bool setNextStage = false;
+
         libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC); // Unlock Coro Gate
-         //libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x14); // Unlock North Faron Gate
+        libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Sacred_Grove), 0x64);
+        giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Small_Key);
+
+        if (libtp::tools::playerIsInRoomStage(4, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Faron_Woods]))
+        {
+            roomNo = 0x4;
+            setNextStage = true;
+        }
+        else if (libtp::tools::playerIsInRoomStage(8, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Faron_Woods]))
+        {
+            roomNo = 0x8;
+            setNextStage = true;
+        }
+
+        if (setNextStage)
+        {
+            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.mRoomNo = roomNo;
+            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.mPoint = 0;
+            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.wipe = 0;
+            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.enabled |= 0x1;
+            setNextStage = false;
+        }
     }
+
 
     KEEP_FUNC void _02_shadowCrystalItemFunc()
     {

@@ -99,8 +99,8 @@ namespace mod::events
     const libtp::tp::dzx::ACTR gMstrSrdActr = {"mstrsrd", 0x000020110, 0.f, 1700.f, -5435.f, 0x147, 0x0, 0x0, 0xFFFF};
 
     const libtp::tp::dzx::ACTR gShadowBeastActr = {"E_s1", 0x15FF0F00, -11717.4f, 902.1f, -9846.7f, 0x0000, 0x4924, 0, 0xFFFF};
-    const libtp::tp::dzx::ACTR gGateActr = {"IGateL", 0x00000F23, -12350.f, -170.f, -17620.f, static_cast<uint16_t>(0x0000), static_cast<int16_t>(0xEAAB), 0, 0xFFFF};
-    const libtp::tp::dzx::ACTR gGateActr2 = {"IGateL", 0x00000F22, -11950.f, -170.f, -17390.f, static_cast<uint16_t>(0x0000), static_cast<int16_t>(0x6AAA), 0, 0xFFFF};
+     const libtp::tp::dzx::ACTR gGateActr =
+        {"IGateL", 0x00000F23, -12350.f, -170.f, -17620.f, 0, static_cast<int16_t>(0xEAAB), 0, 0xFFFF};
 
     void onLoad(rando::Randomizer* randomizer)
     {
@@ -1028,7 +1028,9 @@ namespace mod::events
 
         const auto stagesPtr = &allStages[0];
         tp::dzx::ACTR localSignActor;
+        tp::dzx::ACTR localShadowBeastActr;
         memcpy(&localSignActor, &gSignActor, sizeof(tp::dzx::ACTR));
+        memcpy(&localShadowBeastActr, &gShadowBeastActr, sizeof(tp::dzx::ACTR));
 
         // Set base FLI on custom sign actor based on stage (this pattern allows for 16 custom signs per stage).
         // Currently any FLI in the 0x7000's is reserved for custom signs, but this can change as needed.
@@ -1089,8 +1091,10 @@ namespace mod::events
         using namespace libtp::data::stage;
 
         tp::dzx::ACTR localSignActor;
+        tp::dzx::ACTR localShadowBeastActr;
         tp::d_save::dSv_info_c* savePtr = &tp::d_com_inf_game::dComIfG_gameInfo.save;
         memcpy(&localSignActor, &gSignActor, sizeof(tp::dzx::ACTR));
+        memcpy(&localShadowBeastActr, &gShadowBeastActr, sizeof(tp::dzx::ACTR));
 
         const uint8_t stageIDX = randomizer->getSeedPtr()->getStageIDX();
         const int32_t roomIDX = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mEvtManager.mRoomNo;
@@ -1245,6 +1249,33 @@ namespace mod::events
                 {
                     tools::spawnActor(6, gForestGWolfActr);
                 }
+                 if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x3))
+                {
+                    tools::spawnActor(6, localShadowBeastActr);
+                    localShadowBeastActr.pos.x = -35186.7f;
+                    localShadowBeastActr.pos.z = -15137.6f;
+                    tools::spawnActor(6, localShadowBeastActr);
+                    localShadowBeastActr.pos.x = -36159.1f;
+                    localShadowBeastActr.pos.z = -16896.0f;
+                    tools::spawnActor(6, localShadowBeastActr);
+                }
+                  if (roomIDX == 0)
+                {
+                    if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x47))
+                    {
+                        localShadowBeastActr.parameters = 0x47FF0A00;
+                        localShadowBeastActr.pos.x = -16057.1;
+                        localShadowBeastActr.pos.y = 0.f;
+                        localShadowBeastActr.pos.z = 36.3f;
+                        tools::spawnActor(0, localShadowBeastActr);
+                        localShadowBeastActr.pos.x = -15412.6f;
+                        localShadowBeastActr.pos.z = -350.3f;
+                        tools::spawnActor(0, localShadowBeastActr);
+                        localShadowBeastActr.pos.x = -15256.3f;
+                        localShadowBeastActr.pos.z = 262.f;
+                        tools::spawnActor(0, localShadowBeastActr);
+                    }
+                }
 
                 if (roomIDX == 4)
                 {
@@ -1261,9 +1292,15 @@ namespace mod::events
                         tools::spawnActor(4, gCoroActr);
                     }
                     if(rando::gRandomizer->getSeedPtr()->isCoroKeyEnabled() && !libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC))
-                    {
-                    tools::spawnActor(4,gGateActr);
-                    tools::spawnActor(4,gGateActr2);
+                    {          
+                        tp::dzx::ACTR localGateActor;
+                        memcpy(&localGateActor, &gGateActr, sizeof(tp::dzx::ACTR));
+                        tools::spawnActor(4, localGateActor);
+                        localGateActor.parameters = 0x00000F22;
+                        localGateActor.pos.x = -11950.f;
+                        localGateActor.pos.z = -17390.f;
+                        localGateActor.rot[1] = 0x6AAA;
+                        tools::spawnActor(4, localGateActor);
                     }
                 }
                 break;
@@ -1424,6 +1461,14 @@ namespace mod::events
                 localSignActor.pos.z = 17146.2676f;
                 localSignActor.rot[1] = static_cast<int16_t>(0xAF09);
                 tools::spawnActor(1, localSignActor);
+                localShadowBeastActr.parameters = 0x02FF0800;
+                localShadowBeastActr.pos.x = -1820.3f;
+                localShadowBeastActr.pos.y = -9.7f;
+                localShadowBeastActr.pos.z = -4405.8f;
+                tools::spawnActor(0, localShadowBeastActr);
+                localShadowBeastActr.pos.x = -2402.5f;
+                localShadowBeastActr.pos.z = -3133.2f;
+                tools::spawnActor(0, localShadowBeastActr);
                 break;
             }
 
