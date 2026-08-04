@@ -727,6 +727,11 @@ namespace mod
                             break;
                         }
                     }
+                    if(newStage == stage::StageIDs::Zant_Main_Room && rando::gRandomizer->getSeedPtr()->isZantSkipEnabled() && !d_com_inf_game::dComIfGs_isEventBit(flags::PALACE_OF_TWILIGHT_CLEARED))
+                    {
+                        newStage = stage::StageIDs::Zant_Fight;
+                        newRoom = 57;
+                    }
 
                     return gReturn_dComIfGp_setNextStage(stage::allStages[newStage],
                                                          newSpawn,
