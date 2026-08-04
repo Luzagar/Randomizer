@@ -99,6 +99,9 @@ namespace mod::events
     const libtp::tp::dzx::ACTR gMstrSrdActr = {"mstrsrd", 0x000020110, 0.f, 1700.f, -5435.f, 0x147, 0x0, 0x0, 0xFFFF};
 
     const libtp::tp::dzx::ACTR gShadowBeastActr = {"E_s1", 0x15FF0F00, -11717.4f, 902.1f, -9846.7f, 0x0000, 0x4924, 0, 0xFFFF};
+    const libtp::tp::dzx::ACTR gGateActr = {"IGateL", 0x00000F23, -12350.f, -170.f, -17620.f, static_cast<uint16_t>(0x0000), static_cast<int16_t>(0xEAAB), 0, 0xFFFF};
+    const libtp::tp::dzx::ACTR gGateActr2 = {"IGateL", 0x00000F22, -11950.f, -170.f, -17390.f, static_cast<uint16_t>(0x0000), static_cast<int16_t>(0x6AAA), 0, 0xFFFF};
+
     void onLoad(rando::Randomizer* randomizer)
     {
         randomizer->onStageLoad();
@@ -1257,10 +1260,10 @@ namespace mod::events
                     {
                         tools::spawnActor(4, gCoroActr);
                     }
-                    if(rando::gRandomizer->getSeedPtr()->isCoroKeyEnabled() && !haveItem(libtp::data::items::Coro_Key))
+                    if(rando::gRandomizer->getSeedPtr()->isCoroKeyEnabled() && !libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC))
                     {
-                        //tools::spawnActor(4, gFaronGateActr);
-                        //tools::spawnActor(4, gFaronGateActr);
+                    tools::spawnActor(4,gGateActr);
+                    tools::spawnActor(4,gGateActr2);
                     }
                 }
                 break;
