@@ -28,11 +28,13 @@
 #include "tp/d_com_inf_game.h"
 #include "tp/d_save.h"
 #include "tp/dzx.h"
+#include "tp/f_op_actor_iter.h"
 #include "tp/f_op_actor_mng.h"
 #include "tp/f_op_actor.h"
 #include "tp/f_op_scene_req.h"
 #include "tp/f_op_msg_mng.h"
 #include "tp/f_pc_node_req.h"
+#include "tp/rel/d_a_b_zant.h"
 #include "tp/m_do_controller_pad.h"
 #include "tp/m_do_audio.h"
 #include "item_wheel_menu.h"
@@ -468,6 +470,12 @@ namespace mod
         }
 
         tools::xorshift32(randoPtr->getRandStatePtr());
+        
+        if (randoPtr->randomizerIsEnabled() && randoPtr->getSeedPtr()->isZantSkipEnabled() &&
+            tools::playerIsInRoomStage(57, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Zant_Fight]))
+        {
+            handleZantFightEvent();
+        }
 
         if (randoPtr->getTimeChange() != rando::TimeChange::NO_CHANGE)
         {
@@ -2438,6 +2446,22 @@ namespace mod
         }
 
         playerStatusPtr->currentHealth = static_cast<uint16_t>(newHealthValue);
+    }
+
+    KEEP_FUNC void handleZantFightEvent()
+    {
+        using namespace libtp::tp::rel::d_a_b_zant;
+        using namespace libtp::tp::f_op_actor_iter;
+
+        daB_ZANT_c* zant = (daB_ZANT_c*)(fopAcM_SearchByName(0x0F9));
+        if (!zant || zant->mFightPhase == 6)
+        {
+            return;
+        }
+
+        zant->mFightPhase = 6;
+        zant->mMode = 0;
+        zant->mAction = 18;
     }
 
     KEEP_FUNC libtp::tp::d_resource::dRes_info_c* handle_getResInfo(const char* arcName,

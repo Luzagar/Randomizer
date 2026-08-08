@@ -70,6 +70,7 @@ namespace mod
     void initGiveItemToPlayer(libtp::tp::d_a_alink::daAlink* linkMapPtr, rando::Randomizer* randoPtr);
     void handleFoolishItem(rando::Randomizer* randoPtr);
     void handleBonkDamage();
+    void handleZantFightEvent();
     bool handleAdjustToTSwordReq();
     void adjustMidnaHairColor();
 
