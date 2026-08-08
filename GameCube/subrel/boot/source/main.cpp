@@ -141,8 +141,8 @@ namespace mod
         gReturn_dStage_playerInit = patch::hookFunction(libtp::tp::d_stage::dStage_playerInit, handle_dStage_playerInit);
         gReturn_dStage_Create = patch::hookFunction(libtp::tp::d_stage::dStage_Create, handle_dStage_Create);
 
-        // Only hook dComIfGp_setNextStage if there is at least one shuffled entrance
-        if (seedPtr->getNumShuffledEntrances() > 0)
+        // Only hook dComIfGp_setNextStage if there is at least one shuffled entrance or skip zant
+        if ((seedPtr->getNumShuffledEntrances() > 0) || seedPtr->isZantSkipEnabled())
         {
             gReturn_dComIfGp_setNextStage =
                 patch::hookFunction(libtp::tp::d_com_inf_game::dComIfGp_setNextStage, handle_dComIfGp_setNextStage);

@@ -470,8 +470,8 @@ namespace mod
         }
 
         tools::xorshift32(randoPtr->getRandStatePtr());
-        
-        if (randoPtr->randomizerIsEnabled() && randoPtr->getSeedPtr()->isZantSkipEnabled() &&
+
+        if (randoPtr->randomizerIsEnabled() && seedPtr->isZantSkipEnabled() &&
             tools::playerIsInRoomStage(57, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Zant_Fight]))
         {
             handleZantFightEvent();
@@ -694,6 +694,24 @@ namespace mod
                 stage::allStages[stage::StageIDs::Title_Screen])) // We won't want to shuffle if we are loading a save since
                                                                   // some stages use their default spawn for their entrances.
         {
+            if (!d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Palace_of_Twilight), 0x16))
+            {
+                if ((stageIDX == stage::StageIDs::Zant_Main_Room) && seedPtr->isZantSkipEnabled() &&
+                    d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Palace_of_Twilight]))
+                {
+                    return gReturn_dComIfGp_setNextStage(stage::allStages[stage::StageIDs::Zant_Fight],
+                                                         point,
+                                                         57,
+                                                         layer,
+                                                         lastSpeed,
+                                                         lastMode,
+                                                         setPoint,
+                                                         wipe,
+                                                         lastAngle,
+                                                         param_9,
+                                                         wipSpeedT);
+                }
+            }
             if (seedPtr->isExteriorEREnabled() && ((stageIDX != stage::Zoras_River) && (stageIDX != stage::Upper_Zoras_River)))
             {
                 lastMode = 0;
@@ -705,6 +723,12 @@ namespace mod
                 if ((stageIDX == currentEntrance->getOrigStageIDX()) && (roomNo == currentEntrance->getOrigRoomIDX()) &&
                     (point == currentEntrance->getOrigSpawn()) && (layer == currentEntrance->getOrigState()))
                 {
+                    if (currentEntrance->getNewStageIDX() == libtp::data::stage::Ganondorf_Castle)
+                    {
+                        libtp::tp::d_save::dSv_info_c* savePtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save;
+                        savePtr->save_file.player.player_status_a.currentForm = 0;
+                    }
+
                     // getConsole() << "Shuffling Entrance\n";
 
                     // Note: we use 0 for lastMode so warping out with Ooccoo
@@ -734,11 +758,6 @@ namespace mod
                         {
                             break;
                         }
-                    }
-                    if(newStage == stage::StageIDs::Zant_Main_Room && rando::gRandomizer->getSeedPtr()->isZantSkipEnabled() && !d_com_inf_game::dComIfGs_isEventBit(flags::PALACE_OF_TWILIGHT_CLEARED))
-                    {
-                        newStage = stage::StageIDs::Zant_Fight;
-                        newRoom = 57;
                     }
 
                     return gReturn_dComIfGp_setNextStage(stage::allStages[newStage],
@@ -2454,14 +2473,13 @@ namespace mod
         using namespace libtp::tp::f_op_actor_iter;
 
         daB_ZANT_c* zant = (daB_ZANT_c*)(fopAcM_SearchByName(0x0F9));
-        if (!zant || zant->mFightPhase == 6)
+        if (!zant || zant->mAction == 23 || zant->mFightPhase == 6)
         {
             return;
         }
 
-        zant->mFightPhase = 6;
         zant->mMode = 0;
-        zant->mAction = 18;
+        zant->mAction = 23;
     }
 
     KEEP_FUNC libtp::tp::d_resource::dRes_info_c* handle_getResInfo(const char* arcName,
