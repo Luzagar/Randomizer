@@ -1251,6 +1251,10 @@ namespace mod::events
                 }
                  if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x3))
                 {
+                    localShadowBeastActr.parameters = 0x02FF0B20;
+                    localShadowBeastActr.pos.x = -35298.3f;
+                    localShadowBeastActr.pos.z = -17067.0f;
+                    localShadowBeastActr.pos.y = 300.0f;
                     tools::spawnActor(6, localShadowBeastActr);
                     localShadowBeastActr.pos.x = -35186.7f;
                     localShadowBeastActr.pos.z = -15137.6f;
@@ -1291,7 +1295,7 @@ namespace mod::events
                     {
                         tools::spawnActor(4, gCoroActr);
                     }
-                    if(rando::gRandomizer->getSeedPtr()->isCoroKeyEnabled() && !libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC))
+                    if(rando::gRandomizer->getSeedPtr()->isCoroKeyEnabled() && !tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC))
                     {          
                         tp::dzx::ACTR localGateActor;
                         memcpy(&localGateActor, &gGateActr, sizeof(tp::dzx::ACTR));

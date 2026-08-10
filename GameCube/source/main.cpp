@@ -694,10 +694,10 @@ namespace mod
                 stage::allStages[stage::StageIDs::Title_Screen])) // We won't want to shuffle if we are loading a save since
                                                                   // some stages use their default spawn for their entrances.
         {
-            if (!d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Palace_of_Twilight), 0x16))
+            if ((stageIDX == stage::StageIDs::Zant_Main_Room) && seedPtr->isZantSkipEnabled() &&
+                d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Palace_of_Twilight]))
             {
-                if ((stageIDX == stage::StageIDs::Zant_Main_Room) && seedPtr->isZantSkipEnabled() &&
-                    d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Palace_of_Twilight]))
+                if (!d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Palace_of_Twilight), 0x16))
                 {
                     return gReturn_dComIfGp_setNextStage(stage::allStages[stage::StageIDs::Zant_Fight],
                                                          point,
