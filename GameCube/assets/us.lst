@@ -522,6 +522,7 @@
 
 // f_op_actor_iter.o
 800197F8:fopAcIt_Judge
+80023578:fpcSch_JudgeForPName
 
 // d_gameover.o
 8019b40c:dispWait_init
