@@ -1825,6 +1825,7 @@ namespace mod::events
     {
         using namespace libtp::data;
         using namespace libtp::tp;
+        using namespace libtp::tp::d_com_inf_game;
 
         uint8_t newStageIdx;
         int8_t newRoomNo;
@@ -1901,6 +1902,34 @@ namespace mod::events
             if (newStageIdx == libtp::data::stage::StageIDs::Lakebed_Temple && newRoomNo == 0 &&
                 libtp::tp::d_com_inf_game::dComIfGs_isEventBit(libtp::data::flags::TRANSFORMING_UNLOCKED))
                 newPoint = 2;
+        }
+        if (rando::gRandomizer->getSeedPtr()->isAutoRefillEnabled())
+        {
+            if (events::haveItem(items::Heros_Bow) && dComIfGs_getArrowNum() <= 5)
+            {
+                dComIfGs_setArrowNum(15);
+            }
+
+            if (events::haveItem(items::Goron_Bomb_Bag))
+            {
+                if (dComIfGs_getBombNum() == 0)
+                {
+                   libtp::tp::d_save:: setItem(&dComIfG_gameInfo.save.save_file.player.player_item, 15, 0x70);
+                   dComIfGs_setBombNum(15);
+                }
+
+                if (dComIfGs_getBombNum() <= 5)
+                {
+                    dComIfGs_setBombNum(15);
+                }
+            }
+            if (events::haveItem(items::Lantern))
+            {
+                if (dComIfGps_getOil() <= 5000)
+                {
+                    dComIfGps_setOil(8000);
+                }
+            }
         }
 
         // Clear the lastMode value in case the player was previously riding Epona or swimming.

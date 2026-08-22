@@ -439,32 +439,32 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_faronCoroKeyItemFunc()
     {
-        const libtp::data::stage::AreaNodesID nodeId = libtp::data::stage::AreaNodesID::Faron;
-        uint8_t roomNo = 0;
-        bool setNextStage = false;
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+        using namespace libtp::tp::d_save;
 
-        libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC); // Unlock Coro Gate
-        libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Sacred_Grove), 0x64);
+        const auto stagesPtr = &libtp::data::stage::allStages[0];
+
+        static f_op_actor::fopAc_ac_c* target_info[2];
+        AreaNodesID nodeId = AreaNodesID::Faron;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0xC); // Unlock Coro Gate
         giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Small_Key);
+        nodeId = AreaNodesID::Sacred_Grove;
+       d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0x64); // Unlock Sacred Grove Gate
+        if (d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Faron_Woods]))
+        {
+            void* gate = f_op_actor_iter::fopAcM_SearchByName(0x064);
+            if (gate != nullptr)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    target_info[i] = (f_op_actor::fopAc_ac_c*)f_op_actor_iter::fopAcM_SearchByName(0x064);
+                }
+                target_info[0]->mCollisionRot.y = 0x37E2;
+                target_info[1]->mCollisionRot.y = 0x2ABB;
 
-        if (libtp::tools::playerIsInRoomStage(4, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Faron_Woods]))
-        {
-            roomNo = 0x4;
-            setNextStage = true;
-        }
-        else if (libtp::tools::playerIsInRoomStage(8, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Faron_Woods]))
-        {
-            roomNo = 0x8;
-            setNextStage = true;
-        }
-
-        if (setNextStage)
-        {
-            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.mRoomNo = roomNo;
-            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.mPoint = 0;
-            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.wipe = 0;
-            libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mNextStage.enabled |= 0x1;
-            setNextStage = false;
+            }
         }
     }
 

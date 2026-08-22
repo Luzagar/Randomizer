@@ -7,6 +7,7 @@
 #include "events.h"
 #include "tp/d_a_alink.h"
 #include "tp/d_com_inf_game.h"
+#include "tp/d_item.h"
 #include "rando/randomizer.h"
 
 namespace mod::game_patch
@@ -34,6 +35,34 @@ namespace mod::game_patch
             libtp::tp::d_com_inf_game::dComIfGs_isEventBit(libtp::data::flags::TRANSFORMING_UNLOCKED))
         {
             point = 2;
+        }
+        if (rando::gRandomizer->getSeedPtr()->isAutoRefillEnabled())
+        {
+            if (events::haveItem(items::Heros_Bow) && dComIfGs_getArrowNum() <= 5)
+            {
+                dComIfGs_setArrowNum(15);
+            }
+
+            if (events::haveItem(items::Goron_Bomb_Bag))
+            {
+                if (dComIfGs_getBombNum() == 0)
+                {
+                    libtp::tp::d_save::setItem(&dComIfG_gameInfo.save.save_file.player.player_item, 15, 0x70);
+                    dComIfGs_setBombNum(15);
+                }
+
+                if (dComIfGs_getBombNum() <= 5)
+                {
+                    dComIfGs_setBombNum(15);
+                }
+            }
+            if (events::haveItem(items::Lantern))
+            {
+                if (dComIfGps_getOil() <= 5000)
+                {
+                    dComIfGps_setOil(8000);
+                }
+            }
         }
 
         d_save::dSv_player_return_place_c* playerReturnPlacePtr =

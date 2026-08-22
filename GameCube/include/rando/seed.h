@@ -39,7 +39,8 @@ namespace mod::rando
         RAINBOW_LIGHT_SWORD,
         EXTERIOR_ER_ENABLED,
         SKIP_ZANT,
-        CORO_KEY
+        CORO_KEY,
+        AUTO_REFILL
 
     };
 
@@ -288,6 +289,7 @@ namespace mod::rando
         bool isExteriorEREnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::EXTERIOR_ER_ENABLED); }
         bool isZantSkipEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::SKIP_ZANT); }
         bool isCoroKeyEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::CORO_KEY); }
+        bool isAutoRefillEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::AUTO_REFILL); }
 
         bool spinnerSpeedIsIncreased() const
         {
