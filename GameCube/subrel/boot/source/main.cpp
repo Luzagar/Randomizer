@@ -135,6 +135,10 @@ namespace mod
         gReturn_actorInit = patch::hookFunction(actorInit, handle_actorInit);
         gReturn_actorInit_always = patch::hookFunction(actorInit_always, handle_actorInit_always);
         gReturn_actorCommonLayerInit = patch::hookFunction(actorCommonLayerInit, handle_actorCommonLayerInit);
+         if ((seedPtr->isPlumAccessEnabled()))
+        {
+            gReturn_actorCreate = patch::hookFunction(ActorCreate, handle_actorCreate);
+        }
         gReturn_tgscInfoInit = patch::hookFunction(tgscInfoInit, handle_tgscInfoInit);
         gReturn_roomLoader = patch::hookFunction(libtp::tp::d_stage::roomLoader, handle_roomLoader);
         gReturn_stageLoader = patch::hookFunction(libtp::tp::d_stage::stageLoader, handle_stageLoader);

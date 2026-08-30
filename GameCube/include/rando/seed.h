@@ -40,7 +40,9 @@ namespace mod::rando
         EXTERIOR_ER_ENABLED,
         SKIP_ZANT,
         CORO_KEY,
-        AUTO_REFILL
+        AUTO_REFILL,
+        PLUM_ACCESS
+
 
     };
 
@@ -290,6 +292,7 @@ namespace mod::rando
         bool isZantSkipEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::SKIP_ZANT); }
         bool isCoroKeyEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::CORO_KEY); }
         bool isAutoRefillEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::AUTO_REFILL); }
+        bool isPlumAccessEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::PLUM_ACCESS); }
 
         bool spinnerSpeedIsIncreased() const
         {

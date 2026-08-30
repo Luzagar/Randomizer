@@ -60,6 +60,10 @@ namespace mod
                                                 int32_t unk3,
                                                 void* unk4);
 
+    int32_t handle_actorCreate(libtp::tp::dzx::ACTR* actor, libtp::tp::dzx::ActorPRMClass* actorMemoryPtr);
+
+    extern int32_t (*gReturn_actorCreate)(libtp::tp::dzx::ACTR* actor, libtp::tp::dzx::ActorPRMClass* actorMemoryPtr);
+
     void handle_dComIfGp_setNextStage(const char* stage,
                                       int16_t point,
                                       int8_t roomNo,

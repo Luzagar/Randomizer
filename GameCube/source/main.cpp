@@ -57,6 +57,7 @@
 #include "tp/d_msg_flow.h"
 #include "tp/d_file_select.h"
 #include "tp/dynamic_link.h"
+#include "tp/d_stage.h"
 #include "events.h"
 #include "functionHooks.h"
 
@@ -660,6 +661,27 @@ namespace mod
         events::loadCustomRoomActors(randoPtr);
 
         return gReturn_actorCommonLayerInit(mStatus_roomControl, chunkTypeInfo, unk3, unk4);
+    }
+
+    KEEP_FUNC int32_t handle_actorCreate(libtp::tp::dzx::ACTR* actor, libtp::tp::dzx::ActorPRMClass* actorMemoryPtr)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::data;
+        using namespace d_stage;
+
+        if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
+        {
+            dStage_objectNameInf* actorInf = dStage_searchName(actor->objectName);
+            switch (actorInf->procname)
+            {
+                case 0x14D:
+                case 0x286:
+                    return 0;
+                case 0x287:
+                    return 0;
+            }
+        }
+        return gReturn_actorCreate(actor, actorMemoryPtr);
     }
 
     KEEP_FUNC int32_t handle_tgscInfoInit(void* stageDt, void* i_data, int32_t entryNum, void* param_3)
