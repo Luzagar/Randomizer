@@ -709,6 +709,7 @@ namespace mod
         rando::Seed* seedPtr = rando::gRandomizer->getSeedPtr();
         const uint32_t numShuffledEntrances = seedPtr->getNumShuffledEntrances();
         const rando::ShuffledEntrance* shuffledEntrances = seedPtr->getShuffledEntrancesPtr();
+        libtp::tp::d_a_alink::daAlink* linkMapPtr = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
 
         // getConsole() << stageIDX << "," << roomNo << "," << point << "," << layer << "\n";
 
@@ -734,9 +735,12 @@ namespace mod
                                                          wipSpeedT);
                 }
             }
-            if (seedPtr->isExteriorEREnabled() && ((stageIDX != stage::Zoras_River) && (stageIDX != stage::Upper_Zoras_River)))
+             if (seedPtr->isExteriorEREnabled() && linkMapPtr)
             {
-                lastMode = 0;
+                if (libtp::tp::d_a_alink::checkHorseRide(linkMapPtr))
+                {
+                    lastMode = 0;
+                }
             }
             for (uint32_t i = 0; i < numShuffledEntrances; i++)
             {
