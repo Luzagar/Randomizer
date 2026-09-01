@@ -1249,7 +1249,7 @@ namespace mod::events
                 {
                     tools::spawnActor(6, gForestGWolfActr);
                 }
-                 if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x3))
+                 if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0x2))
                 {
                     localShadowBeastActr.parameters = 0x02FF0B20;
                     localShadowBeastActr.pos.x = -35298.3f;

@@ -449,9 +449,9 @@ namespace mod::game_patch
         AreaNodesID nodeId = AreaNodesID::Faron;
 
         d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0xC); // Unlock Coro Gate
+         d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0x02); // Unlock Coro Gate
+          d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0x47); // Unlock Coro Gate
         giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Small_Key);
-        nodeId = AreaNodesID::Sacred_Grove;
-       d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0x64); // Unlock Sacred Grove Gate
         if (d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Faron_Woods]))
         {
             void* gate = f_op_actor_iter::fopAcM_SearchByName(0x064);
