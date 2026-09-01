@@ -87,7 +87,7 @@ namespace mod::game_patch
                             condition = libtp::tp::d_com_inf_game::dComIfGs_isEventBit(ORDON_DAY_2_OVER); // Talo Saved
                             if (condition)
                             {
-                                chosenLayer = stage::FaronStateIDs::Faron_MDH_Completed;
+                                chosenLayer = rando::gRandomizer->getSeedPtr()->isLockedLWEnabled() ? stage::FaronStateIDs::Faron_Snowpeak_Completed : stage::FaronStateIDs::Faron_MDH_Completed;            
                             }
                             else
                             {

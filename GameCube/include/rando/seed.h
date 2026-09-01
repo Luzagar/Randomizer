@@ -41,7 +41,8 @@ namespace mod::rando
         SKIP_ZANT,
         CORO_KEY,
         AUTO_REFILL,
-        PLUM_ACCESS
+        PLUM_ACCESS,
+        LOCKED_LW
 
 
     };
@@ -293,6 +294,7 @@ namespace mod::rando
         bool isCoroKeyEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::CORO_KEY); }
         bool isAutoRefillEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::AUTO_REFILL); }
         bool isPlumAccessEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::PLUM_ACCESS); }
+        bool isLockedLWEnabled() const { return this->flagBitfieldFlagIsEnabled(SeedEnabledFlag::LOCKED_LW); }
 
         bool spinnerSpeedIsIncreased() const
         {
