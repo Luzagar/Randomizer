@@ -135,7 +135,7 @@ namespace mod
         gReturn_actorInit = patch::hookFunction(actorInit, handle_actorInit);
         gReturn_actorInit_always = patch::hookFunction(actorInit_always, handle_actorInit_always);
         gReturn_actorCommonLayerInit = patch::hookFunction(actorCommonLayerInit, handle_actorCommonLayerInit);
-         if ((seedPtr->isPlumAccessEnabled()))
+         if ((seedPtr->isRemovePlummEnabled()))
         {
             gReturn_actorCreate = patch::hookFunction(ActorCreate, handle_actorCreate);
         }
