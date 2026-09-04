@@ -1821,6 +1821,62 @@ namespace mod::events
         }
     }
 
+    static void checkArrowNum()
+    {
+        using namespace libtp::data;
+        using namespace libtp::tp::d_com_inf_game;
+
+        if (events::haveItem(items::Heros_Bow) && dComIfGs_getArrowNum() <= 5)
+        {
+            dComIfGs_setArrowNum(15);
+        }
+    }
+
+    static void checkBombNum()
+    {
+        using namespace libtp::data;
+        using namespace libtp::tp::d_com_inf_game;
+
+        if (!events::haveItem(items::Goron_Bomb_Bag))
+        {
+            return;
+        }
+
+        if (dComIfGs_getBombNum() == 0)
+        {
+            libtp::tp::d_save::setItem(&dComIfG_gameInfo.save.save_file.player.player_item, 15, 0x70);
+            dComIfGs_setBombNum(15);
+        }
+
+        if (dComIfGs_getBombNum() <= 5)
+        {
+            dComIfGs_setBombNum(15);
+        }
+    }
+
+    static void checkOilNum()
+    {
+        using namespace libtp::data;
+        using namespace libtp::tp::d_com_inf_game;
+
+        if (events::haveItem(items::Lantern) && dComIfGps_getOil() <= 5000)
+        {
+            dComIfGps_setOil(8000);
+        }
+    }
+
+    void handleAutoRefill()
+    {
+        if (!rando::gRandomizer->getSeedPtr()->isAutoRefillEnabled())
+        {
+            return;
+        }
+
+        checkArrowNum();
+        checkBombNum();
+        checkOilNum();
+    }
+
     void handleReturnToLocation(bool isReturnToDungeonEntrance)
     {
         using namespace libtp::data;
@@ -1903,34 +1959,7 @@ namespace mod::events
                 libtp::tp::d_com_inf_game::dComIfGs_isEventBit(libtp::data::flags::TRANSFORMING_UNLOCKED))
                 newPoint = 2;
         }
-        if (rando::gRandomizer->getSeedPtr()->isAutoRefillEnabled())
-        {
-            if (events::haveItem(items::Heros_Bow) && dComIfGs_getArrowNum() <= 5)
-            {
-                dComIfGs_setArrowNum(15);
-            }
-
-            if (events::haveItem(items::Goron_Bomb_Bag))
-            {
-                if (dComIfGs_getBombNum() == 0)
-                {
-                   libtp::tp::d_save:: setItem(&dComIfG_gameInfo.save.save_file.player.player_item, 15, 0x70);
-                   dComIfGs_setBombNum(15);
-                }
-
-                if (dComIfGs_getBombNum() <= 5)
-                {
-                    dComIfGs_setBombNum(15);
-                }
-            }
-            if (events::haveItem(items::Lantern))
-            {
-                if (dComIfGps_getOil() <= 5000)
-                {
-                    dComIfGps_setOil(8000);
-                }
-            }
-        }
+        handleAutoRefill();
 
         // Clear the lastMode value in case the player was previously riding Epona or swimming.
         savePtr->mRestart.mLastMode = 0;

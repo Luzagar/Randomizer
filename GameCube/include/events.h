@@ -160,6 +160,7 @@ namespace mod::events
     void loadCustomRoomActors(rando::Randomizer* randomizer);
     void loadCustomRoomSCOBs();
     void handleQuickTransform(rando::Randomizer* randomizer);
+    void handleAutoRefill();
     void handleTimeOfDayChange();
     void handleReturnToLocation(bool isReturnToDungeonEntrance);
     bool checkFoolItemFreeze();

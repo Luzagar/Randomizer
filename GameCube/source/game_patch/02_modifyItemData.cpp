@@ -325,8 +325,11 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_snowpeakBigKeyItemFunc()
     {
+        using namespace libtp::tp;
         const libtp::data::stage::AreaNodesID nodeId = libtp::data::stage::AreaNodesID::Snowpeak_Ruins;
         giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Big_Key);
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Snowpeak_Ruins), 0x08); // unlock bedroom door
+        
     }
 
     KEEP_FUNC void _02_totSmallKeyItemFunc()

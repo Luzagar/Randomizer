@@ -36,34 +36,7 @@ namespace mod::game_patch
         {
             point = 2;
         }
-        if (rando::gRandomizer->getSeedPtr()->isAutoRefillEnabled())
-        {
-            if (events::haveItem(items::Heros_Bow) && dComIfGs_getArrowNum() <= 5)
-            {
-                dComIfGs_setArrowNum(15);
-            }
-
-            if (events::haveItem(items::Goron_Bomb_Bag))
-            {
-                if (dComIfGs_getBombNum() == 0)
-                {
-                    libtp::tp::d_save::setItem(&dComIfG_gameInfo.save.save_file.player.player_item, 15, 0x70);
-                    dComIfGs_setBombNum(15);
-                }
-
-                if (dComIfGs_getBombNum() <= 5)
-                {
-                    dComIfGs_setBombNum(15);
-                }
-            }
-            if (events::haveItem(items::Lantern))
-            {
-                if (dComIfGps_getOil() <= 5000)
-                {
-                    dComIfGps_setOil(8000);
-                }
-            }
-        }
+        events::handleAutoRefill();
 
         d_save::dSv_player_return_place_c* playerReturnPlacePtr =
             &d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_return_place;
