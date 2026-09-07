@@ -2243,6 +2243,12 @@ namespace mod
                 }
             }
         }
+        switch (item_id)
+        {
+            case Lantern_Oil_Scooped:
+            case Yellow_Chu_Jelly:
+                return true; // allow using oil and jelly bottle anywhere
+        }
 
         return gReturn_checkCastleTownUseItem(item_id);
     }
@@ -2495,15 +2501,16 @@ namespace mod
 
     KEEP_FUNC void handleZantFightEvent()
     {
-        using namespace libtp::tp::rel::d_a_b_zant;
-        using namespace libtp::tp::f_op_actor_iter;
+        using namespace libtp::tp;
+        using namespace rel::d_a_b_zant;
+        using namespace f_op_actor_iter;
+
 
         daB_ZANT_c* zant = (daB_ZANT_c*)(fopAcM_SearchByName(0x0F9));
         if (!zant || zant->mAction == 23 || zant->mFightPhase == 6)
         {
             return;
-        }
-        libtp::tp::d_a_alink::swordEquip(0);
+            
         zant->mMode = 0;
         zant->mAction = 23;
     }

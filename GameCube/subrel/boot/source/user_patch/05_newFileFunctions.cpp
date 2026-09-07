@@ -81,4 +81,12 @@ namespace mod::user_patch
 
         *checkCutLargeTurnState_address = ASM_NOP;
     }
+    void alwaysCanDropOilBottle(rando::Randomizer* randomizer)
+    {
+        (void)randomizer;
+        uint32_t* checkNewItemChange_address =
+            reinterpret_cast<uint32_t*>(reinterpret_cast<uint32_t>(libtp::tp::d_a_alink::checkNewItemChange) + 0x6E4);
+
+        *checkNewItemChange_address = ASM_NOP;
+    }
 } // namespace mod::user_patch

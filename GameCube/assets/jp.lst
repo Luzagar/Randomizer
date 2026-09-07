@@ -175,7 +175,7 @@
 801417f4:checkKandelaarSwing
 800d2af4:checkCutLargeTurnState
 8001e130:checkHorseRide
-800b942c:swordEquip
+800c0ad4:checkNewItemChange
 
 // data
 80388C0C:climbVars
