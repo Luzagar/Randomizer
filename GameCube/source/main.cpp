@@ -2503,7 +2503,7 @@ namespace mod
         {
             return;
         }
-
+        libtp::tp::d_a_alink::swordEquip(0);
         zant->mMode = 0;
         zant->mAction = 23;
     }
