@@ -822,6 +822,7 @@ namespace mod
         rando::Seed* seedPtr = rando::gRandomizer->getSeedPtr();
         const uint32_t numShuffledEntrances = seedPtr->getNumShuffledEntrances();
         const rando::ShuffledEntrance* shuffledEntrances = seedPtr->getShuffledEntrancesPtr();
+         libtp::tp::d_a_alink::daAlink* linkMapPtr = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
 
         if ((stageIDX == stage::StageIDs::Zant_Main_Room) && seedPtr->isZantSkipEnabled() &&
             d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Palace_of_Twilight]))
