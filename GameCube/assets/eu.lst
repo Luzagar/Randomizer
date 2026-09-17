@@ -113,6 +113,7 @@
 80019e40:fopAcM_create
 8001bbbc:fopAcM_getTalkEventPartner
 8001b68c:fopAcM_orderChangeEventId
+80019d24:fopAcM_delete
 
 // f_op_msg_mng.o
 8001ff2c:fopMsgM_messageSet

@@ -669,20 +669,133 @@ namespace mod
         using namespace libtp::data;
         using namespace d_stage;
 
-        if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
+        dStage_objectNameInf* actorInf = dStage_searchName(actor->objectName);
+        switch (actorInf->procname)
         {
-            dStage_objectNameInf* actorInf = dStage_searchName(actor->objectName);
-            switch (actorInf->procname)
-            {
-                case 0x14D:
-                case 0x286:
+            case 0x14D:
+            case 0x286:
+            case 0x287:
+                if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
+                {
                     return 0;
-                case 0x287:
-                    return 0;
-            }
+                }
+                break;
+            // case 0x136:
+            //     getConsole() << "Check fish with parameters: " << actor->parameters << "\n";
+            //     if (!checkFishCreate(actor->parameters))
+            //     {
+            //         return 0;
+            //     }
+            //     break;
         }
         return gReturn_actorCreate(actor, actorMemoryPtr);
     }
+
+    // KEEP_FUNC void handleFishDelete(uint16_t eventBit)
+    // {
+    //     using namespace libtp::tp;
+    //     using namespace libtp::data;
+    //     using namespace f_op_actor;
+
+    //     fopAc_ac_c* fish_ac = (fopAc_ac_c*)f_op_actor_iter::fopAcM_SearchByName(0x136);
+    //     if (fish_ac == nullptr)
+    //     {
+    //         getConsole() << "Fish actor not found,how is this possible!\n";
+    //         return;
+    //     }
+    //     switch (eventBit)
+    //     {
+    //         case flags::CAUGHT_A_GREENGILL:
+    //         {
+    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
+    //             if (fish_ac->mSubtype == 5)
+    //             {
+    //                  f_op_actor_mng::fopAcM_delete(fish_ac);
+    //             }
+    //             break;
+    //         }
+    //         case flags::CAUGHT_A_HYRULE_BASS_NON_BOAT:
+    //         {
+    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
+    //             if (fish_ac->mSubtype == 6)
+    //             {
+    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
+    //             }
+    //             break;
+    //         }
+    //         case flags::CAUGHT_AN_ADULT_HYLIAN_LOACH:
+    //         {
+    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
+    //             if (fish_ac->mSubtype == 7)
+    //             {
+    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
+    //             }
+    //             break;
+    //         }
+    //         case flags::CAUGHT_A_HYLIAN_PIKE_NON_BOAT:
+    //         {
+    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
+    //             if (fish_ac->mSubtype == 8)
+    //             {
+    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
+    //             }
+    //             break;
+    //         }
+    //         case flags::CAUGHT_AN_ORDON_CATFISH_NON_BOAT:
+    //         {
+    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";   
+    //             if (fish_ac->mSubtype == 9)
+    //             {
+    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
+    //             }
+    //             break;
+    //         }
+    //         default:
+    //             break;
+    //     }
+    // }
+
+    // static constexpr uint16_t EVENT_BIT[5] = {
+    //     libtp::data::flags::CAUGHT_A_GREENGILL,
+    //     libtp::data::flags::CAUGHT_A_HYRULE_BASS_NON_BOAT,
+    //     libtp::data::flags::CAUGHT_AN_ADULT_HYLIAN_LOACH,
+    //     libtp::data::flags::CAUGHT_A_HYLIAN_PIKE_NON_BOAT,
+    //     libtp::data::flags::CAUGHT_AN_ORDON_CATFISH_NON_BOAT,
+    // };
+
+    // KEEP_FUNC bool checkFishCreate(int8_t argument)
+    // {
+    //     using namespace libtp::tp;
+    //     using namespace libtp::data;
+    //     int8_t bitNo;
+    //     getConsole() << "Checking fish creation for argument: " << argument << "\n";
+    //     switch (argument)
+    //     {
+    //         case 5:
+    //             if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Ordon_Village]))
+    //             {
+    //                 return false;
+    //             }
+    //             bitNo = 0;
+    //             break;
+    //         case 6:
+    //             bitNo = 1;
+    //             break;
+    //         case 7:
+    //             bitNo = 2;
+    //             break;
+    //         case 8:
+    //             bitNo = 3;
+    //             break;
+    //         case 9:
+    //             bitNo = 4;
+    //             break;
+    //         default:
+    //         getConsole() << "Invalid argument for fish creation: " << argument << "\n";
+    //             return false;
+    //     }
+    //     return d_com_inf_game::dComIfGs_isEventBit(EVENT_BIT[bitNo]);
+    // }
 
     KEEP_FUNC int32_t handle_tgscInfoInit(void* stageDt, void* i_data, int32_t entryNum, void* param_3)
     {
@@ -735,7 +848,7 @@ namespace mod
                                                          wipSpeedT);
                 }
             }
-             if (seedPtr->isExteriorEREnabled() && linkMapPtr)
+            if (seedPtr->isExteriorEREnabled() && linkMapPtr)
             {
                 if (libtp::tp::d_a_alink::checkHorseRide(linkMapPtr))
                 {
@@ -1873,6 +1986,38 @@ namespace mod
                     break;
                 }
 
+                // case CAUGHT_A_GREENGILL:
+                // {
+                //     getConsole()<< "Fish caught: Greengill\n";
+                //     handleFishDelete(CAUGHT_A_GREENGILL);
+                //     break;
+                // }
+
+                // case CAUGHT_A_HYRULE_BASS_NON_BOAT:
+                // {
+                //     getConsole()<< "Fish caught: Hyrule Bass (Non-Boat)\n";
+                //     handleFishDelete(CAUGHT_A_HYRULE_BASS_NON_BOAT);
+                //     break;
+                // }
+                // case CAUGHT_AN_ADULT_HYLIAN_LOACH:
+                // {
+                //     getConsole()<< "Fish caught: Adult Hylian Loach\n";
+                //     handleFishDelete(CAUGHT_AN_ADULT_HYLIAN_LOACH);
+                //     break;
+                // }
+                // case CAUGHT_A_HYLIAN_PIKE_NON_BOAT:
+                // {
+                //     getConsole()<< "Fish caught: Hylian Pike (Non-Boat)\n";
+                //     handleFishDelete(CAUGHT_A_HYLIAN_PIKE_NON_BOAT);
+                //     break;
+                // }
+                // case CAUGHT_AN_ORDON_CATFISH_NON_BOAT:
+                // {
+                //     getConsole()<< "Fish caught: Ordon Catfish (Non-Boat)\n";
+                //     handleFishDelete(CAUGHT_AN_ORDON_CATFISH_NON_BOAT);
+                //     break;  
+                // }
+
                 default:
                 {
                     break;
@@ -2505,12 +2650,12 @@ namespace mod
         using namespace rel::d_a_b_zant;
         using namespace f_op_actor_iter;
 
-
         daB_ZANT_c* zant = (daB_ZANT_c*)(fopAcM_SearchByName(0x0F9));
         if (!zant || zant->mAction == 23 || zant->mFightPhase == 6)
         {
             return;
-            
+        }
+
         zant->mMode = 0;
         zant->mAction = 23;
     }

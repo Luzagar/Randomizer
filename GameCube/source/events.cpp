@@ -1465,6 +1465,8 @@ namespace mod::events
                 localSignActor.pos.z = 17146.2676f;
                 localSignActor.rot[1] = static_cast<int16_t>(0xAF09);
                 tools::spawnActor(1, localSignActor);
+                if (!libtp::tp::d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Lanayru), 0x2))
+                {
                 localShadowBeastActr.parameters = 0x02FF0800;
                 localShadowBeastActr.pos.x = -1820.3f;
                 localShadowBeastActr.pos.y = -9.7f;
@@ -1473,6 +1475,7 @@ namespace mod::events
                 localShadowBeastActr.pos.x = -2402.5f;
                 localShadowBeastActr.pos.z = -3133.2f;
                 tools::spawnActor(0, localShadowBeastActr);
+                }
                 break;
             }
 
