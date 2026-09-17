@@ -823,6 +823,7 @@ namespace mod
         const uint32_t numShuffledEntrances = seedPtr->getNumShuffledEntrances();
         const rando::ShuffledEntrance* shuffledEntrances = seedPtr->getShuffledEntrancesPtr();
         libtp::tp::d_a_alink::daAlink* linkMapPtr = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
+        libtp::tp::d_a_alink::daAlink* linkMapPtr = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
 
         // getConsole() << stageIDX << "," << roomNo << "," << point << "," << layer << "\n";
 
@@ -830,30 +831,9 @@ namespace mod
                 stage::allStages[stage::StageIDs::Title_Screen])) // We won't want to shuffle if we are loading a save since
                                                                   // some stages use their default spawn for their entrances.
         {
-            if ((stageIDX == stage::StageIDs::Zant_Main_Room) && seedPtr->isZantSkipEnabled() &&
-                d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Palace_of_Twilight]))
+            if (seedPtr->isExteriorEREnabled() && ((stageIDX != stage::Zoras_River) && (stageIDX != stage::Upper_Zoras_River)))
             {
-                if (!d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Palace_of_Twilight), 0x16))
-                {
-                    return gReturn_dComIfGp_setNextStage(stage::allStages[stage::StageIDs::Zant_Fight],
-                                                         point,
-                                                         57,
-                                                         layer,
-                                                         lastSpeed,
-                                                         lastMode,
-                                                         setPoint,
-                                                         wipe,
-                                                         lastAngle,
-                                                         param_9,
-                                                         wipSpeedT);
-                }
-            }
-            if (seedPtr->isExteriorEREnabled() && linkMapPtr)
-            {
-                if (libtp::tp::d_a_alink::checkHorseRide(linkMapPtr))
-                {
-                    lastMode = 0;
-                }
+                lastMode = 0;
             }
             for (uint32_t i = 0; i < numShuffledEntrances; i++)
             {
