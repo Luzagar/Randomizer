@@ -76,10 +76,6 @@ namespace mod::events
     // Poe actor template
     const libtp::tp::dzx::ACTR gImpPoeActr = {"E_hp", 0xFF031E00, 4531.19f, -30.f, 2631.961f, 0, 0, 0x0, 0xFFFF};
 
-    // Boar actor template
-    const libtp::tp::dzx::ACTR gCampBoarActr =
-        {"E_wb", 0xFFFFFFFF, 1650.f, 0.f, 1250.f, 0, static_cast<int16_t>(0xA000), 0x0, 0xFFFF};
-
     const libtp::tp::dzx::ACTR gCoroActr =
         {"Kkri", 0x174EFF01, -13505.f, 250.f, -14405.f, 0x65, static_cast<int16_t>(0xC889), 0x0, 0xFFFF};
 
@@ -1035,6 +1031,10 @@ namespace mod::events
         {
             tools::spawnActor(0, gEponaActr);
         }
+        if (tp::d_a_alink::checkStageName(stagesPtr[StageIDs::Ordon_Spring]))
+        {
+            tools::spawnActor(0, gEponaActr);
+        }
         else if (libtp::tools::playerIsInRoomStage(0, stagesPtr[libtp::data::stage::StageIDs::Ordon_Village]))
         {
             tp::dzx::ACTR localEponaActor;
@@ -1264,11 +1264,6 @@ namespace mod::events
 
             case StageIDs::Bulblin_Camp:
             {
-                if (!libtp::tp::d_com_inf_game::dComIfGs_isEventBit(libtp::data::flags::ESCAPED_BURNING_TENT_IN_BULBLIN_CAMP))
-                {
-                    tools::spawnActor(1, gCampBoarActr);
-                }
-
                 localSignActor.pos.x = -568.556152f;
                 localSignActor.pos.y = 260.f;
                 localSignActor.pos.z = -3969.31f;
@@ -1811,6 +1806,12 @@ namespace mod::events
                 // Unset the flag that starts MDH
                 *memoryFlagsPtr &= ~0x40;
                 d_save::offEventBit(&saveFilePtr->mEvent, flags::MIDNAS_DESPERATE_HOUR_STARTED);
+            }
+
+            // Remove Ooccoo from the player's inventory if they haven't used it.
+            if (saveFilePtr->player.player_item.item[18] != libtp::data::items::Ooccoo_Jr)
+            {
+                libtp::tp::d_save::setItem(&saveFilePtr->player.player_item, 18, 0xFF);
             }
 
             // Turn the player back into Link if they are currently wolf
