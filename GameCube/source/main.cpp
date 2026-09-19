@@ -35,6 +35,7 @@
 #include "tp/f_op_msg_mng.h"
 #include "tp/f_pc_node_req.h"
 #include "tp/rel/d_a_b_zant.h"
+#include "tp/rel/d_a_mg_fish.h"
 #include "tp/m_do_controller_pad.h"
 #include "tp/m_do_audio.h"
 #include "item_wheel_menu.h"
@@ -60,13 +61,30 @@
 #include "tp/d_stage.h"
 #include "events.h"
 #include "functionHooks.h"
-
 namespace mod
 {
+    using namespace libtp;
     // Variables
     KEEP_VAR libtp::display::Console* gConsole = nullptr;
     KEEP_VAR bool gConsoleState = false;
     KEEP_VAR float rainbowPhaseAngle = 0.0f;
+
+    static constexpr int s_fish_max = 30;
+    static libtp::tp::rel::d_a_mg_fish::daMg_Fish_c* target_info[s_fish_max];
+    static int target_info_count;
+    static uint8_t s_fish_kind;
+
+    static libtp::tp::rel::d_a_mg_fish::daMg_Fish_c* fish[s_fish_max];
+    static int target_to_delete;
+    static constexpr uint16_t EVENT_BIT[5] = {
+        libtp::data::flags::CAUGHT_A_GREENGILL,
+        libtp::data::flags::CAUGHT_A_HYRULE_BASS_NON_BOAT,
+        libtp::data::flags::CAUGHT_A_BABY_HYLIAN_LOACH,
+        libtp::data::flags::CAUGHT_A_HYLIAN_PIKE_NON_BOAT,
+        libtp::data::flags::CAUGHT_AN_ORDON_CATFISH_NON_BOAT,
+    };
+
+    static void procFishDelete();
 
     void main()
     {
@@ -384,6 +402,10 @@ namespace mod
                 // Handle transforming
                 events::handleQuickTransform(randoPtr);
             }
+            if (linkMapPtr)
+            {
+                procFishDelete();
+            }
             else if (linkMapPtr && checkButtonsHeld(PadInputs::Button_R) && seedPtr->spinnerSpeedIsIncreased())
             {
                 libtp::tp::f_op_actor::fopAc_ac_c* spinnerActor = libtp::tp::d_a_alink::getSpinnerActor(linkMapPtr);
@@ -669,133 +691,168 @@ namespace mod
         using namespace libtp::data;
         using namespace d_stage;
 
-        dStage_objectNameInf* actorInf = dStage_searchName(actor->objectName);
-        switch (actorInf->procname)
+        if (strcmp(actor->objectName, "Obj_Tbi") == 0 || strcmp(actor->objectName, "myna2") == 0 ||
+            strcmp(actor->objectName, "myn2tag") == 0)
         {
-            case 0x14D:
-            case 0x286:
-            case 0x287:
-                if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
-                {
-                    return 0;
-                }
-                break;
-            // case 0x136:
-            //     getConsole() << "Check fish with parameters: " << actor->parameters << "\n";
-            //     if (!checkFishCreate(actor->parameters))
-            //     {
-            //         return 0;
-            //     }
-            //     break;
+            if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
+            {
+                return 0;
+            }
         }
+        else if (strcmp(actor->objectName, "Fish") == 0)
+        {
+            if (checkFishCreate(actor->parameters))
+            {
+                return 0;
+            }
+        }
+
         return gReturn_actorCreate(actor, actorMemoryPtr);
     }
 
-    // KEEP_FUNC void handleFishDelete(uint16_t eventBit)
-    // {
-    //     using namespace libtp::tp;
-    //     using namespace libtp::data;
-    //     using namespace f_op_actor;
+    static bool checkFishing()
+    {
+        using namespace libtp::tp;
 
-    //     fopAc_ac_c* fish_ac = (fopAc_ac_c*)f_op_actor_iter::fopAcM_SearchByName(0x136);
-    //     if (fish_ac == nullptr)
-    //     {
-    //         getConsole() << "Fish actor not found,how is this possible!\n";
-    //         return;
-    //     }
-    //     switch (eventBit)
-    //     {
-    //         case flags::CAUGHT_A_GREENGILL:
-    //         {
-    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
-    //             if (fish_ac->mSubtype == 5)
-    //             {
-    //                  f_op_actor_mng::fopAcM_delete(fish_ac);
-    //             }
-    //             break;
-    //         }
-    //         case flags::CAUGHT_A_HYRULE_BASS_NON_BOAT:
-    //         {
-    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
-    //             if (fish_ac->mSubtype == 6)
-    //             {
-    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
-    //             }
-    //             break;
-    //         }
-    //         case flags::CAUGHT_AN_ADULT_HYLIAN_LOACH:
-    //         {
-    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
-    //             if (fish_ac->mSubtype == 7)
-    //             {
-    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
-    //             }
-    //             break;
-    //         }
-    //         case flags::CAUGHT_A_HYLIAN_PIKE_NON_BOAT:
-    //         {
-    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";
-    //             if (fish_ac->mSubtype == 8)
-    //             {
-    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
-    //             }
-    //             break;
-    //         }
-    //         case flags::CAUGHT_AN_ORDON_CATFISH_NON_BOAT:
-    //         {
-    //             getConsole() << "Handling fish argument: " << fish_ac->mSubtype  << "\n";   
-    //             if (fish_ac->mSubtype == 9)
-    //             {
-    //                 f_op_actor_mng::fopAcM_delete(fish_ac);
-    //             }
-    //             break;
-    //         }
-    //         default:
-    //             break;
-    //     }
-    // }
+        d_a_alink::daAlink* linkMapPtr = d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
+        if (linkMapPtr == nullptr)
+        {
+            return false;
+        }
 
-    // static constexpr uint16_t EVENT_BIT[5] = {
-    //     libtp::data::flags::CAUGHT_A_GREENGILL,
-    //     libtp::data::flags::CAUGHT_A_HYRULE_BASS_NON_BOAT,
-    //     libtp::data::flags::CAUGHT_AN_ADULT_HYLIAN_LOACH,
-    //     libtp::data::flags::CAUGHT_A_HYLIAN_PIKE_NON_BOAT,
-    //     libtp::data::flags::CAUGHT_AN_ORDON_CATFISH_NON_BOAT,
-    // };
+        switch (linkMapPtr->mProcID)
+        {
+            case d_a_alink::PROC_CANOE_FISHING_WAIT:
+            case d_a_alink::PROC_CANOE_FISHING_REEL:
+            case d_a_alink::PROC_CANOE_FISHING_GET:
+            case d_a_alink::PROC_FISHING_CAST:
+            case d_a_alink::PROC_FISHING_FOOD:
+            case d_a_alink::PROC_CAUGHT:
+            case d_a_alink::PROC_GET_ITEM:
+                return true;
+            default:
+                return false;
+        }
+    }
 
-    // KEEP_FUNC bool checkFishCreate(int8_t argument)
-    // {
-    //     using namespace libtp::tp;
-    //     using namespace libtp::data;
-    //     int8_t bitNo;
-    //     getConsole() << "Checking fish creation for argument: " << argument << "\n";
-    //     switch (argument)
-    //     {
-    //         case 5:
-    //             if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Ordon_Village]))
-    //             {
-    //                 return false;
-    //             }
-    //             bitNo = 0;
-    //             break;
-    //         case 6:
-    //             bitNo = 1;
-    //             break;
-    //         case 7:
-    //             bitNo = 2;
-    //             break;
-    //         case 8:
-    //             bitNo = 3;
-    //             break;
-    //         case 9:
-    //             bitNo = 4;
-    //             break;
-    //         default:
-    //         getConsole() << "Invalid argument for fish creation: " << argument << "\n";
-    //             return false;
-    //     }
-    //     return d_com_inf_game::dComIfGs_isEventBit(EVENT_BIT[bitNo]);
-    // }
+    static void procFishDelete()
+    {
+        using namespace libtp::tp;
+
+        if (target_to_delete == 0 || checkFishing())
+        {
+            return;
+        }
+
+        for (int i = 0; i < target_to_delete; i++)
+        {
+            f_op_actor_mng::fopAcM_delete(fish[i]);
+            target_info[i] = nullptr;
+            fish[i] = nullptr;
+        }
+        target_to_delete = 0;
+    }
+
+    static void* s_fish_sub(void* i_actor, void* i_data)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::tp::rel;
+
+        if (i_actor == nullptr)
+        {
+            return nullptr;
+        }
+
+        if (f_op_actor_iter::fpcSch_JudgeForPName(i_actor, i_data) != nullptr)
+        {
+            d_a_mg_fish::daMg_Fish_c* fish_ac = (d_a_mg_fish::daMg_Fish_c*)i_actor;
+
+            if (fish_ac == nullptr)
+            {
+                return nullptr;
+            }
+
+            if (fish_ac->mGedouKind == s_fish_kind && target_info_count < s_fish_max)
+            {
+                target_info[target_info_count] = fish_ac;
+                target_info_count++;
+            }
+        }
+        return nullptr;
+    }
+
+    KEEP_FUNC void handleFishDelete(uint8_t kind)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::tp::rel;
+
+        int16_t procName = 0x136;
+        target_info_count = 0;
+        s_fish_kind = kind;
+        f_op_actor_iter::fopAcIt_Judge(s_fish_sub, &procName);
+
+        for (int i = 0; i < target_info_count; i++)
+        {
+            rel::d_a_mg_fish::daMg_Fish_c* fish_ac = target_info[i];
+            if (fish_ac == nullptr)
+            {
+                continue;
+            }
+
+            if (target_to_delete < s_fish_max)
+            {
+                fish[target_to_delete] = fish_ac;
+                target_to_delete++;
+            }
+        }
+    }
+
+   
+
+    KEEP_FUNC bool checkFishCreate(uint32_t parameters)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::data;
+        uint8_t bitNo;
+        switch (parameters &= 0xFF)
+        {
+            case 0x64:
+            {
+            if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Ordon_Village]))
+            {
+                return false;
+            }
+                bitNo = 0;
+                break;
+            }
+
+            case 0x65:
+            {
+                bitNo = 1;
+                break;
+            }
+
+            case 0x66:
+            {
+                bitNo = 2;
+                break;
+            }
+            case 0x67:
+            {
+                bitNo = 3;
+                break;
+            }
+            case 0x68:
+            {
+                bitNo = 4;
+                break;
+            }
+
+            default:
+                return false;
+        }
+        return d_com_inf_game::dComIfGs_isEventBit(EVENT_BIT[bitNo]);
+    }
 
     KEEP_FUNC int32_t handle_tgscInfoInit(void* stageDt, void* i_data, int32_t entryNum, void* param_3)
     {
@@ -822,7 +879,7 @@ namespace mod
         rando::Seed* seedPtr = rando::gRandomizer->getSeedPtr();
         const uint32_t numShuffledEntrances = seedPtr->getNumShuffledEntrances();
         const rando::ShuffledEntrance* shuffledEntrances = seedPtr->getShuffledEntrancesPtr();
-         libtp::tp::d_a_alink::daAlink* linkMapPtr = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
+        libtp::tp::d_a_alink::daAlink* linkMapPtr = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
 
         if ((stageIDX == stage::StageIDs::Zant_Main_Room) && seedPtr->isZantSkipEnabled() &&
             d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Palace_of_Twilight]))
@@ -849,9 +906,20 @@ namespace mod
                 stage::allStages[stage::StageIDs::Title_Screen])) // We won't want to shuffle if we are loading a save since
                                                                   // some stages use their default spawn for their entrances.
         {
-            if (seedPtr->isExteriorEREnabled() && ((stageIDX != stage::Zoras_River) && (stageIDX != stage::Upper_Zoras_River)))
+            if (seedPtr->isExteriorEREnabled() && linkMapPtr)
             {
-                lastMode = 0;
+                libtp::tp::d_save::dSv_player_status_a_c* playerStatusPtr =
+                    &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_status_a;
+                if (libtp::tp::d_a_alink::checkHorseRide(linkMapPtr))
+                {
+                    lastMode = 0;
+                }
+                // If we are digging as a wolf, we want to spawn in normally since digging into a non-dig entrance spits the
+                // player back out.
+                else if ((playerStatusPtr->currentForm == 1) && (lastMode == 9))
+                {
+                    lastMode = 0;
+                }
             }
             for (uint32_t i = 0; i < numShuffledEntrances; i++)
             {
@@ -1984,37 +2052,32 @@ namespace mod
                     break;
                 }
 
-                // case CAUGHT_A_GREENGILL:
-                // {
-                //     getConsole()<< "Fish caught: Greengill\n";
-                //     handleFishDelete(CAUGHT_A_GREENGILL);
-                //     break;
-                // }
+                case CAUGHT_A_GREENGILL:
+                {
+                    handleFishDelete(5);
+                    break;
+                }
 
-                // case CAUGHT_A_HYRULE_BASS_NON_BOAT:
-                // {
-                //     getConsole()<< "Fish caught: Hyrule Bass (Non-Boat)\n";
-                //     handleFishDelete(CAUGHT_A_HYRULE_BASS_NON_BOAT);
-                //     break;
-                // }
-                // case CAUGHT_AN_ADULT_HYLIAN_LOACH:
-                // {
-                //     getConsole()<< "Fish caught: Adult Hylian Loach\n";
-                //     handleFishDelete(CAUGHT_AN_ADULT_HYLIAN_LOACH);
-                //     break;
-                // }
-                // case CAUGHT_A_HYLIAN_PIKE_NON_BOAT:
-                // {
-                //     getConsole()<< "Fish caught: Hylian Pike (Non-Boat)\n";
-                //     handleFishDelete(CAUGHT_A_HYLIAN_PIKE_NON_BOAT);
-                //     break;
-                // }
-                // case CAUGHT_AN_ORDON_CATFISH_NON_BOAT:
-                // {
-                //     getConsole()<< "Fish caught: Ordon Catfish (Non-Boat)\n";
-                //     handleFishDelete(CAUGHT_AN_ORDON_CATFISH_NON_BOAT);
-                //     break;  
-                // }
+                case CAUGHT_A_HYRULE_BASS_NON_BOAT:
+                {
+                    handleFishDelete(6);
+                    break;
+                }
+                case CAUGHT_AN_ADULT_HYLIAN_LOACH:
+                {
+                    handleFishDelete(7);
+                    break;
+                }
+                case CAUGHT_A_HYLIAN_PIKE_NON_BOAT:
+                {
+                    handleFishDelete(8);
+                    break;
+                }
+                case CAUGHT_AN_ORDON_CATFISH_NON_BOAT:
+                {
+                    handleFishDelete(9);
+                    break;
+                }
 
                 default:
                 {
