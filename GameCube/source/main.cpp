@@ -701,7 +701,7 @@ namespace mod
         }
         else if (strcmp(actor->objectName, "Fish") == 0)
         {
-            if (checkFishCreate(actor->parameters))
+            if (checkFishNotCreate(actor->parameters))
             {
                 return 0;
             }
@@ -734,16 +734,39 @@ namespace mod
                 return false;
         }
     }
+    static void* s_fish_flag_sub(void* i_actor, void* i_data)
+{
+    using namespace libtp::tp;
+    using namespace libtp::tp::rel;
 
-    static void procFishDelete()
+    if (i_actor == nullptr)
     {
-        using namespace libtp::tp;
+        return nullptr;
+    }
 
-        if (target_to_delete == 0 || checkFishing())
+    if (f_op_actor_iter::fpcSch_JudgeForPName(i_actor, i_data) != nullptr)
+    {
+        d_a_mg_fish::daMg_Fish_c* fish_ac = (d_a_mg_fish::daMg_Fish_c*)i_actor;
+
+        if (fish_ac != nullptr && checkFishKindFlag(fish_ac->mGedouKind))
         {
-            return;
+            f_op_actor_mng::fopAcM_delete(fish_ac);
         }
+    }
+    return nullptr;
+}
 
+static void procFishDelete()
+{
+    using namespace libtp::tp;
+
+    if (checkFishing())
+    {
+        return;
+    }
+
+    if (target_to_delete > 0)
+    {
         for (int i = 0; i < target_to_delete; i++)
         {
             f_op_actor_mng::fopAcM_delete(fish[i]);
@@ -752,6 +775,56 @@ namespace mod
         }
         target_to_delete = 0;
     }
+    else
+    {
+        int16_t procName = 0x136;
+        f_op_actor_iter::fopAcIt_Judge(s_fish_flag_sub, &procName);
+    }
+}
+
+KEEP_FUNC bool checkFishKindFlag(uint8_t kind)
+{
+    using namespace libtp::tp;
+
+    uint8_t bitNo;
+    switch (kind)
+    {
+        case 5:
+        {
+            bitNo = 0;
+            break;
+        }
+
+        case 6:
+        {
+            bitNo = 1;
+            break;
+        }
+
+        case 7: // a tester hylian loach
+        {
+            bitNo = 2;
+            break;
+        }
+
+        case 8:
+        {
+            bitNo = 3;
+            break;
+        }
+
+        case 9: 
+        {
+            bitNo = 4;
+            break;
+        }
+
+        default:
+            return false;
+    }
+
+    return d_com_inf_game::dComIfGs_isEventBit(EVENT_BIT[bitNo]);
+}
 
     static void* s_fish_sub(void* i_actor, void* i_data)
     {
@@ -807,9 +880,8 @@ namespace mod
         }
     }
 
-   
-
-    KEEP_FUNC bool checkFishCreate(uint32_t parameters)
+    
+    KEEP_FUNC bool checkFishNotCreate(uint32_t parameters)
     {
         using namespace libtp::tp;
         using namespace libtp::data;
@@ -2063,7 +2135,7 @@ namespace mod
                     handleFishDelete(6);
                     break;
                 }
-                case CAUGHT_AN_ADULT_HYLIAN_LOACH:
+                case CAUGHT_A_BABY_HYLIAN_LOACH:
                 {
                     handleFishDelete(7);
                     break;

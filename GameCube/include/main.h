@@ -71,7 +71,8 @@ namespace mod
     void handleFoolishItem(rando::Randomizer* randoPtr);
     void handleBonkDamage();
     void handleZantFightEvent();
-    bool checkFishCreate(uint32_t parameters);
+    bool checkFishNotCreate(uint32_t parameters);
+    bool checkFishKindFlag(uint8_t kind);
     bool handleAdjustToTSwordReq();
     void adjustMidnaHairColor();
 
