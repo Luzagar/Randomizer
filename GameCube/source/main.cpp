@@ -2062,6 +2062,10 @@ static void procFishDelete()
 
                 case CAUGHT_A_GREENGILL:
                 {
+                    if(libtp::tp::d_a_alink::checkStageName(libtp::data::stage::allStages[libtp::data::stage::StageIDs::Ordon_Village]))
+                    {
+                        break;
+                    }
                     handleFishDelete(5);
                     break;
                 }
