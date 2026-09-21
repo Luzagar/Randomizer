@@ -690,13 +690,15 @@ namespace mod
         using namespace libtp::tp;
         using namespace libtp::data;
         using namespace d_stage;
-
-        if (strcmp(actor->objectName, "Obj_Tbi") == 0 || strcmp(actor->objectName, "myna2") == 0 ||
-            strcmp(actor->objectName, "myn2tag") == 0)
+        if ((rando::gRandomizer->getSeedPtr()->isRemovePlummEnabled()))
         {
-            if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
+            if (strcmp(actor->objectName, "Obj_Tbi") == 0 || strcmp(actor->objectName, "myna2") == 0 ||
+                strcmp(actor->objectName, "myn2tag") == 0)
             {
-                return 0;
+                if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
+                {
+                    return 0;
+                }
             }
         }
         else if (strcmp(actor->objectName, "Fish") == 0)
@@ -776,14 +778,7 @@ static void procFishDelete()
         }
         target_to_delete = 0;
     }
-    else
-    {
-        if(!d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Fishing_Pond]))
-        {
-            int16_t procName = 0x136;
-            f_op_actor_iter::fopAcIt_Judge(s_fish_flag_sub, &procName);
-        }
-    }
+    return;
 }
 
 KEEP_FUNC bool checkFishKindFlag(uint8_t kind)
@@ -811,7 +806,7 @@ KEEP_FUNC bool checkFishKindFlag(uint8_t kind)
             break;
         }
 
-        case 7: // a tester hylian loach
+        case 7:
         {
             bitNo = 2;
             break;
