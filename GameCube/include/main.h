@@ -72,7 +72,6 @@ namespace mod
     void handleBonkDamage();
     void handleZantFightEvent();
     bool checkFishNotCreate(uint32_t parameters);
-    bool checkFishKindFlag(uint8_t kind);
     bool handleAdjustToTSwordReq();
     void adjustMidnaHairColor();
 

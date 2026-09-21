@@ -736,27 +736,7 @@ namespace mod
                 return false;
         }
     }
-    static void* s_fish_flag_sub(void* i_actor, void* i_data)
-{
-    using namespace libtp::tp;
-    using namespace libtp::tp::rel;
-
-    if (i_actor == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (f_op_actor_iter::fpcSch_JudgeForPName(i_actor, i_data) != nullptr)
-    {
-        d_a_mg_fish::daMg_Fish_c* fish_ac = (d_a_mg_fish::daMg_Fish_c*)i_actor;
-
-        if (fish_ac != nullptr && checkFishKindFlag(fish_ac->mGedouKind))
-        {
-            f_op_actor_mng::fopAcM_delete(fish_ac);
-        }
-    }
-    return nullptr;
-}
+   
 
 static void procFishDelete()
 {
@@ -781,55 +761,6 @@ static void procFishDelete()
     return;
 }
 
-KEEP_FUNC bool checkFishKindFlag(uint8_t kind)
-{
-    using namespace libtp::tp;
-    using namespace libtp::data;
-
-    uint8_t bitNo;
-    switch (kind)
-    {
-        case 5:
-        {
-            if(d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Ordon_Village]))
-            {
-                return false;
-            }
-                bitNo = 0;
-            
-            break;
-        }
-
-        case 6:
-        {
-            bitNo = 1;
-            break;
-        }
-
-        case 7:
-        {
-            bitNo = 2;
-            break;
-        }
-
-        case 8:
-        {
-            bitNo = 3;
-            break;
-        }
-
-        case 9: 
-        {
-            bitNo = 4;
-            break;
-        }
-
-        default:
-            return false;
-    }
-
-    return d_com_inf_game::dComIfGs_isEventBit(EVENT_BIT[bitNo]);
-}
 
     static void* s_fish_sub(void* i_actor, void* i_data)
     {
