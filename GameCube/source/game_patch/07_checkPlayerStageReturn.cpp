@@ -7,6 +7,7 @@
 #include "events.h"
 #include "tp/d_a_alink.h"
 #include "tp/d_com_inf_game.h"
+#include "tp/d_item.h"
 #include "rando/randomizer.h"
 
 namespace mod::game_patch
@@ -35,6 +36,7 @@ namespace mod::game_patch
         {
             point = 2;
         }
+        events::handleAutoRefill();
 
         d_save::dSv_player_return_place_c* playerReturnPlacePtr =
             &d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_return_place;

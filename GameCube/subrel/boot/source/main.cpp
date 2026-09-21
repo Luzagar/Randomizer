@@ -135,14 +135,16 @@ namespace mod
         gReturn_actorInit = patch::hookFunction(actorInit, handle_actorInit);
         gReturn_actorInit_always = patch::hookFunction(actorInit_always, handle_actorInit_always);
         gReturn_actorCommonLayerInit = patch::hookFunction(actorCommonLayerInit, handle_actorCommonLayerInit);
+        
+        gReturn_actorCreate = patch::hookFunction(ActorCreate, handle_actorCreate);
         gReturn_tgscInfoInit = patch::hookFunction(tgscInfoInit, handle_tgscInfoInit);
         gReturn_roomLoader = patch::hookFunction(libtp::tp::d_stage::roomLoader, handle_roomLoader);
         gReturn_stageLoader = patch::hookFunction(libtp::tp::d_stage::stageLoader, handle_stageLoader);
         gReturn_dStage_playerInit = patch::hookFunction(libtp::tp::d_stage::dStage_playerInit, handle_dStage_playerInit);
         gReturn_dStage_Create = patch::hookFunction(libtp::tp::d_stage::dStage_Create, handle_dStage_Create);
 
-        // Only hook dComIfGp_setNextStage if there is at least one shuffled entrance
-        if (seedPtr->getNumShuffledEntrances() > 0)
+        // Only hook dComIfGp_setNextStage if there is at least one shuffled entrance or skip zant
+        if ((seedPtr->getNumShuffledEntrances() > 0) || seedPtr->isZantSkipEnabled())
         {
             gReturn_dComIfGp_setNextStage =
                 patch::hookFunction(libtp::tp::d_com_inf_game::dComIfGp_setNextStage, handle_dComIfGp_setNextStage);

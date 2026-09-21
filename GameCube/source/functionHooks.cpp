@@ -41,6 +41,9 @@ namespace mod
                                                   int32_t unk3,
                                                   void* unk4) = nullptr;
 
+    KEEP_VAR int32_t (*gReturn_actorCreate)(libtp::tp::dzx::ACTR* actor,
+                                            libtp::tp::dzx::ActorPRMClass* actorMemoryPtr) = nullptr;
+
     KEEP_VAR int32_t (*gReturn_tgscInfoInit)(void* stageDt, void* i_data, int32_t entryNum, void* param_3) = nullptr;
     KEEP_VAR void (*gReturn_roomLoader)(void* data, void* stageDt, int32_t roomNo) = nullptr;
     KEEP_VAR void (*gReturn_stageLoader)(void* data, void* stageDt) = nullptr;

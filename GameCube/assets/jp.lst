@@ -50,6 +50,7 @@
 8044aea5:mOldStayNo
 80026d38:dStage_Create
 804002d4:mDemoArcName
+80024dc0:dStage_searchName
 
 // d_save.o
 80032AA8:getRupeeMax
@@ -112,6 +113,7 @@
 80019d98:fopAcM_create
 8001bb14:fopAcM_getTalkEventPartner
 8001b5e4:fopAcM_orderChangeEventId
+80019c7c:fopAcM_delete
 
 // f_op_msg_mng.o
 8001fe84:fopMsgM_messageSet
@@ -173,6 +175,8 @@
 801237f4:setLightningSwordEffect
 801417f4:checkKandelaarSwing
 800d2af4:checkCutLargeTurnState
+8001e130:checkHorseRide
+800c0ad4:checkNewItemChange
 
 // data
 80388C0C:climbVars
@@ -516,6 +520,7 @@
 
 // f_op_actor_iter.o
 800197F8:fopAcIt_Judge
+80023578:fpcSch_JudgeForPName
 
 // d_gameover.o
 8019b3cc:dispWait_init

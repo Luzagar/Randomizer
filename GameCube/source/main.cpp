@@ -28,11 +28,14 @@
 #include "tp/d_com_inf_game.h"
 #include "tp/d_save.h"
 #include "tp/dzx.h"
+#include "tp/f_op_actor_iter.h"
 #include "tp/f_op_actor_mng.h"
 #include "tp/f_op_actor.h"
 #include "tp/f_op_scene_req.h"
 #include "tp/f_op_msg_mng.h"
 #include "tp/f_pc_node_req.h"
+#include "tp/rel/d_a_b_zant.h"
+#include "tp/rel/d_a_mg_fish.h"
 #include "tp/m_do_controller_pad.h"
 #include "tp/m_do_audio.h"
 #include "item_wheel_menu.h"
@@ -55,15 +58,33 @@
 #include "tp/d_msg_flow.h"
 #include "tp/d_file_select.h"
 #include "tp/dynamic_link.h"
+#include "tp/d_stage.h"
 #include "events.h"
 #include "functionHooks.h"
-
 namespace mod
 {
+    using namespace libtp;
     // Variables
     KEEP_VAR libtp::display::Console* gConsole = nullptr;
     KEEP_VAR bool gConsoleState = false;
     KEEP_VAR float rainbowPhaseAngle = 0.0f;
+
+    static constexpr int s_fish_max = 30;
+    static libtp::tp::rel::d_a_mg_fish::daMg_Fish_c* target_info[s_fish_max];
+    static int target_info_count;
+    static uint8_t s_fish_kind;
+
+    static libtp::tp::rel::d_a_mg_fish::daMg_Fish_c* fish[s_fish_max];
+    static int target_to_delete;
+    static constexpr uint16_t EVENT_BIT[5] = {
+        libtp::data::flags::CAUGHT_A_GREENGILL,
+        libtp::data::flags::CAUGHT_A_HYRULE_BASS_NON_BOAT,
+        libtp::data::flags::CAUGHT_A_BABY_HYLIAN_LOACH,
+        libtp::data::flags::CAUGHT_A_HYLIAN_PIKE_NON_BOAT,
+        libtp::data::flags::CAUGHT_AN_ORDON_CATFISH_NON_BOAT,
+    };
+
+    static void procFishDelete();
 
     void main()
     {
@@ -381,6 +402,10 @@ namespace mod
                 // Handle transforming
                 events::handleQuickTransform(randoPtr);
             }
+            if (linkMapPtr)
+            {
+                procFishDelete();
+            }
             else if (linkMapPtr && checkButtonsHeld(PadInputs::Button_R) && seedPtr->spinnerSpeedIsIncreased())
             {
                 libtp::tp::f_op_actor::fopAc_ac_c* spinnerActor = libtp::tp::d_a_alink::getSpinnerActor(linkMapPtr);
@@ -468,6 +493,12 @@ namespace mod
         }
 
         tools::xorshift32(randoPtr->getRandStatePtr());
+
+        if (randoPtr->randomizerIsEnabled() && seedPtr->isZantSkipEnabled() &&
+            tools::playerIsInRoomStage(57, libtp::data::stage::allStages[libtp::data::stage::StageIDs::Zant_Fight]))
+        {
+            handleZantFightEvent();
+        }
 
         if (randoPtr->getTimeChange() != rando::TimeChange::NO_CHANGE)
         {
@@ -654,6 +685,183 @@ namespace mod
         return gReturn_actorCommonLayerInit(mStatus_roomControl, chunkTypeInfo, unk3, unk4);
     }
 
+    KEEP_FUNC int32_t handle_actorCreate(libtp::tp::dzx::ACTR* actor, libtp::tp::dzx::ActorPRMClass* actorMemoryPtr)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::data;
+        using namespace d_stage;
+        if ((rando::gRandomizer->getSeedPtr()->isRemovePlummEnabled()))
+        {
+            if (strcmp(actor->objectName, "Obj_Tbi") == 0 || strcmp(actor->objectName, "myna2") == 0 ||
+                strcmp(actor->objectName, "myn2tag") == 0)
+            {
+                if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Lake_Hylia]))
+                {
+                    return 0;
+                }
+            }
+        }
+        else if (strcmp(actor->objectName, "Fish") == 0)
+        {
+            if (checkFishNotCreate(actor->parameters))
+            {
+                return 0;
+            }
+        }
+
+        return gReturn_actorCreate(actor, actorMemoryPtr);
+    }
+
+    static bool checkFishing()
+    {
+        using namespace libtp::tp;
+
+        d_a_alink::daAlink* linkMapPtr = d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
+        if (linkMapPtr == nullptr)
+        {
+            return false;
+        }
+
+        switch (linkMapPtr->mProcID)
+        {
+            case d_a_alink::PROC_CANOE_FISHING_WAIT:
+            case d_a_alink::PROC_CANOE_FISHING_REEL:
+            case d_a_alink::PROC_CANOE_FISHING_GET:
+            case d_a_alink::PROC_FISHING_CAST:
+            case d_a_alink::PROC_FISHING_FOOD:
+            case d_a_alink::PROC_CAUGHT:
+            case d_a_alink::PROC_GET_ITEM:
+                return true;
+            default:
+                return false;
+        }
+    }
+   
+
+static void procFishDelete()
+{
+    using namespace libtp::tp;
+    using namespace libtp::data;
+
+    if (checkFishing())
+    {
+        return;
+    }
+
+    if (target_to_delete > 0)
+    {
+        for (int i = 0; i < target_to_delete; i++)
+        {
+            f_op_actor_mng::fopAcM_delete(fish[i]);
+            target_info[i] = nullptr;
+            fish[i] = nullptr;
+        }
+        target_to_delete = 0;
+    }
+    return;
+}
+
+
+    static void* s_fish_sub(void* i_actor, void* i_data)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::tp::rel;
+
+        if (i_actor == nullptr)
+        {
+            return nullptr;
+        }
+
+        if (f_op_actor_iter::fpcSch_JudgeForPName(i_actor, i_data) != nullptr)
+        {
+            d_a_mg_fish::daMg_Fish_c* fish_ac = (d_a_mg_fish::daMg_Fish_c*)i_actor;
+
+            if (fish_ac == nullptr)
+            {
+                return nullptr;
+            }
+
+            if (fish_ac->mGedouKind == s_fish_kind && target_info_count < s_fish_max)
+            {
+                target_info[target_info_count] = fish_ac;
+                target_info_count++;
+            }
+        }
+        return nullptr;
+    }
+
+    KEEP_FUNC void handleFishDelete(uint8_t kind)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::tp::rel;
+
+        int16_t procName = 0x136;
+        target_info_count = 0;
+        s_fish_kind = kind;
+        f_op_actor_iter::fopAcIt_Judge(s_fish_sub, &procName);
+
+        for (int i = 0; i < target_info_count; i++)
+        {
+            rel::d_a_mg_fish::daMg_Fish_c* fish_ac = target_info[i];
+            if (fish_ac == nullptr)
+            {
+                continue;
+            }
+
+            if (target_to_delete < s_fish_max)
+            {
+                fish[target_to_delete] = fish_ac;
+                target_to_delete++;
+            }
+        }
+    }
+
+    
+    KEEP_FUNC bool checkFishNotCreate(uint32_t parameters)
+    {
+        using namespace libtp::tp;
+        using namespace libtp::data;
+        uint8_t bitNo;
+        switch (parameters &= 0xFF)
+        {
+            case 0x64:
+            {
+            if (d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Ordon_Village]))
+            {
+                return false;
+            }
+                bitNo = 0;
+                break;
+            }
+
+            case 0x65:
+            {
+                bitNo = 1;
+                break;
+            }
+
+            case 0x66:
+            {
+                bitNo = 2;
+                break;
+            }
+            case 0x67:
+            {
+                bitNo = 3;
+                break;
+            }
+            case 0x68:
+            {
+                bitNo = 4;
+                break;
+            }
+
+            default:
+                return false;
+        }
+        return d_com_inf_game::dComIfGs_isEventBit(EVENT_BIT[bitNo]);
+    }
+
     KEEP_FUNC int32_t handle_tgscInfoInit(void* stageDt, void* i_data, int32_t entryNum, void* param_3)
     {
         events::loadCustomRoomSCOBs();
@@ -679,6 +887,26 @@ namespace mod
         rando::Seed* seedPtr = rando::gRandomizer->getSeedPtr();
         const uint32_t numShuffledEntrances = seedPtr->getNumShuffledEntrances();
         const rando::ShuffledEntrance* shuffledEntrances = seedPtr->getShuffledEntrancesPtr();
+        libtp::tp::d_a_alink::daAlink* linkMapPtr = libtp::tp::d_com_inf_game::dComIfG_gameInfo.play.mPlayer;
+
+        if ((stageIDX == stage::StageIDs::Zant_Main_Room) && seedPtr->isZantSkipEnabled() &&
+            d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Palace_of_Twilight]))
+        {
+            if (!d_com_inf_game::dComIfGs_isStageSwitch(static_cast<uint32_t>(AreaNodesID::Palace_of_Twilight), 0x16))
+            {
+                return gReturn_dComIfGp_setNextStage(stage::allStages[stage::StageIDs::Zant_Fight],
+                                                     point,
+                                                     57,
+                                                     layer,
+                                                     lastSpeed,
+                                                     lastMode,
+                                                     setPoint,
+                                                     wipe,
+                                                     lastAngle,
+                                                     param_9,
+                                                     wipSpeedT);
+            }
+        }
 
         // getConsole() << stageIDX << "," << roomNo << "," << point << "," << layer << "\n";
 
@@ -686,9 +914,20 @@ namespace mod
                 stage::allStages[stage::StageIDs::Title_Screen])) // We won't want to shuffle if we are loading a save since
                                                                   // some stages use their default spawn for their entrances.
         {
-            if (seedPtr->isExteriorEREnabled() && ((stageIDX != stage::Zoras_River) && (stageIDX != stage::Upper_Zoras_River)))
+            if (seedPtr->isExteriorEREnabled() && linkMapPtr)
             {
-                lastMode = 0;
+                libtp::tp::d_save::dSv_player_status_a_c* playerStatusPtr =
+                    &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save.save_file.player.player_status_a;
+                if (libtp::tp::d_a_alink::checkHorseRide(linkMapPtr))
+                {
+                    lastMode = 0;
+                }
+                // If we are digging as a wolf, we want to spawn in normally since digging into a non-dig entrance spits the
+                // player back out.
+                else if ((playerStatusPtr->currentForm == 1) && (lastMode == 9))
+                {
+                    lastMode = 0;
+                }
             }
             for (uint32_t i = 0; i < numShuffledEntrances; i++)
             {
@@ -697,6 +936,12 @@ namespace mod
                 if ((stageIDX == currentEntrance->getOrigStageIDX()) && (roomNo == currentEntrance->getOrigRoomIDX()) &&
                     (point == currentEntrance->getOrigSpawn()) && (layer == currentEntrance->getOrigState()))
                 {
+                    if (currentEntrance->getNewStageIDX() == libtp::data::stage::Ganondorf_Castle)
+                    {
+                        libtp::tp::d_save::dSv_info_c* savePtr = &libtp::tp::d_com_inf_game::dComIfG_gameInfo.save;
+                        savePtr->save_file.player.player_status_a.currentForm = 0;
+                    }
+
                     // getConsole() << "Shuffling Entrance\n";
 
                     // Note: we use 0 for lastMode so warping out with Ooccoo
@@ -1815,6 +2060,33 @@ namespace mod
                     break;
                 }
 
+                case CAUGHT_A_GREENGILL:
+                {
+                    handleFishDelete(5);
+                    break;
+                }
+
+                case CAUGHT_A_HYRULE_BASS_NON_BOAT:
+                {
+                    handleFishDelete(6);
+                    break;
+                }
+                case CAUGHT_A_BABY_HYLIAN_LOACH:
+                {
+                    handleFishDelete(7);
+                    break;
+                }
+                case CAUGHT_A_HYLIAN_PIKE_NON_BOAT:
+                {
+                    handleFishDelete(8);
+                    break;
+                }
+                case CAUGHT_AN_ORDON_CATFISH_NON_BOAT:
+                {
+                    handleFishDelete(9);
+                    break;
+                }
+
                 default:
                 {
                     break;
@@ -2185,6 +2457,12 @@ namespace mod
                 }
             }
         }
+        switch (item_id)
+        {
+            case Lantern_Oil_Scooped:
+            case Yellow_Chu_Jelly:
+                return true; // allow using oil and jelly bottle anywhere
+        }
 
         return gReturn_checkCastleTownUseItem(item_id);
     }
@@ -2433,6 +2711,22 @@ namespace mod
         }
 
         playerStatusPtr->currentHealth = static_cast<uint16_t>(newHealthValue);
+    }
+
+    KEEP_FUNC void handleZantFightEvent()
+    {
+        using namespace libtp::tp;
+        using namespace rel::d_a_b_zant;
+        using namespace f_op_actor_iter;
+
+        daB_ZANT_c* zant = (daB_ZANT_c*)(fopAcM_SearchByName(0x0F9));
+        if (!zant || zant->mAction == 23 || zant->mFightPhase == 6)
+        {
+            return;
+        }
+
+        zant->mMode = 0;
+        zant->mAction = 23;
     }
 
     KEEP_FUNC libtp::tp::d_resource::dRes_info_c* handle_getResInfo(const char* arcName,

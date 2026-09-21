@@ -786,6 +786,12 @@ namespace mod::game_patch
                 // This is the `Choose a Quest Log` text on the file select screen
                 return seedPtr->getHeaderPtr()->getSeedNamePtr();
             }
+            // To-DO mettre en place les hint ici
+            // case 0x43:
+            // {
+            //     This is the `Quest Log` text on the file select screen
+            //     return seedPtr->getHeaderPtr()->getSeedNamePtr();
+            // }
             case 0xFFFF:
             {
                 // This is a special entry that is added to the very end of the messages, and is only included to make sure that

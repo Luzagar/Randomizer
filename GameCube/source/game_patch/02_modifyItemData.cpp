@@ -325,8 +325,11 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_snowpeakBigKeyItemFunc()
     {
+        using namespace libtp::tp;
         const libtp::data::stage::AreaNodesID nodeId = libtp::data::stage::AreaNodesID::Snowpeak_Ruins;
         giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Big_Key);
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Snowpeak_Ruins), 0x08); // unlock bedroom door
+        
     }
 
     KEEP_FUNC void _02_totSmallKeyItemFunc()
@@ -439,7 +442,35 @@ namespace mod::game_patch
 
     KEEP_FUNC void _02_faronCoroKeyItemFunc()
     {
-        libtp::tp::d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(AreaNodesID::Faron), 0xC); // Unlock Coro Gate
+        using namespace libtp::data::stage;
+        using namespace libtp::tp;
+        using namespace libtp::tp::d_save;
+
+        AreaNodesID nodeId = AreaNodesID::Faron;
+
+        d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0xC); // Unlock Coro Gate
+        if (rando::gRandomizer->getSeedPtr()->isCoroKeyEnabled())
+        {
+            const auto stagesPtr = &libtp::data::stage::allStages[0];
+            static f_op_actor::fopAc_ac_c* target_info[2];
+
+            d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0x02); // Unlock Coro Gate
+            d_com_inf_game::dComIfGs_onStageSwitch(static_cast<uint32_t>(nodeId), 0x47); // Unlock Coro Gate
+            giveNodeDungeonItems(nodeId, libtp::data::items::NodeDungeonItemType::Small_Key);
+            if (d_a_alink::checkStageName(stagesPtr[libtp::data::stage::StageIDs::Faron_Woods]))
+            {
+                void* gate = f_op_actor_iter::fopAcM_SearchByName(0x064);
+                if (gate != nullptr)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        target_info[i] = (f_op_actor::fopAc_ac_c*)f_op_actor_iter::fopAcM_SearchByName(0x064);
+                    }
+                    target_info[0]->mCollisionRot.y = 0x37E2;
+                    target_info[1]->mCollisionRot.y = 0x2ABB;
+                }
+            }
+        }
     }
 
     KEEP_FUNC void _02_shadowCrystalItemFunc()

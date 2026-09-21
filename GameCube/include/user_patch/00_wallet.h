@@ -11,7 +11,7 @@
 
 namespace mod::user_patch
 {
-    extern uint16_t walletValues[4][3];
+    extern uint16_t walletValues[5][3];
     void patchWallet(uint8_t walletSize);
 } // namespace mod::user_patch
 #endif
