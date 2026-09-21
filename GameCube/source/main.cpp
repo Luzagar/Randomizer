@@ -759,6 +759,7 @@ namespace mod
 static void procFishDelete()
 {
     using namespace libtp::tp;
+    using namespace libtp::data;
 
     if (checkFishing())
     {
@@ -777,21 +778,30 @@ static void procFishDelete()
     }
     else
     {
-        int16_t procName = 0x136;
-        f_op_actor_iter::fopAcIt_Judge(s_fish_flag_sub, &procName);
+        if(!d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Fishing_Pond]))
+        {
+            int16_t procName = 0x136;
+            f_op_actor_iter::fopAcIt_Judge(s_fish_flag_sub, &procName);
+        }
     }
 }
 
 KEEP_FUNC bool checkFishKindFlag(uint8_t kind)
 {
     using namespace libtp::tp;
+    using namespace libtp::data;
 
     uint8_t bitNo;
     switch (kind)
     {
         case 5:
         {
-            bitNo = 0;
+            if(d_a_alink::checkStageName(stage::allStages[stage::StageIDs::Ordon_Village]))
+            {
+                return false;
+            }
+                bitNo = 0;
+            
             break;
         }
 
